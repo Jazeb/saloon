@@ -1,0 +1,130 @@
+type Query {
+	LIVE_PRODUCTS(
+		category_id: Int!
+		user_id: Int!
+		limit: Int
+		offset: Int
+		k: String # key to search for filter
+		v: String # value to search for filter
+		filters: Boolean! # true or false for filters
+		sorting: Boolean! # true or false for search
+		status: String
+		price_min: Int
+		price_max: Int
+		product_type: String
+		quantity: String
+		time: String
+		city: String
+	): [Product]
+	UPCOMMING_PRODUCTS(
+		category_id: Int!
+		user_id: Int!
+		limit: Int
+		offset: Int
+		k: String
+		v: String
+		status: String
+		filters: Boolean! # true or false for filters
+		sorting: Boolean!
+		product_type: String
+		quantity: String
+		time: String
+		price_min: Int
+		price_max: Int
+		city: String
+	): [Product]
+	GET_PRODUCT(product_id: Int!): [Product]
+}
+
+type Mutation {
+	createProduct(
+		product_type: String
+		title: String
+		in_session: Boolean
+	): Product
+}
+
+scalar Date
+
+type Bids {
+	product_id: Int
+	bid_price: Float
+	status: String
+	user_id: Int
+	city: String
+	created_at: Date
+}
+
+type Call {
+	product: Product
+	call: String
+	start_time: String
+	status: String
+	call_start_time: String
+}
+
+type Subscription {
+	PRODUCT_ADDED: Product
+	BID_PLACED: Product
+	SESSION_STARTED: SESSION_STARTED
+	CALL_STATUS: Call
+}
+
+type SESSION_STARTED {
+	call: String
+	start_time: String
+	product: Product
+	repost_end_time:String
+	call_start_time: String
+}
+
+type ProductsGalleries {
+	image_url: String
+}
+
+type FavouriteProducts {
+	product_id: Int
+	user_id: Int
+}
+
+type BiddingTickets {
+	product_id: Int
+	ticket_price: Int
+	agreement_id: String
+	user_id: Int
+	status: String
+}
+
+type ProductCategory {
+	title: String
+	description: String
+	icon: String
+	id: Int
+}
+
+type Product {
+	id: Int
+	status: String
+	title: String
+	bids: [Bids]
+	product_type: String
+	in_session: Boolean
+	start_session_time: String
+	bid_percent: Float
+	quantity: String
+	description: String
+	user_id: Int
+	ticket_price: Int
+	bid_count: Int
+	call: String
+	start_time: String
+	isFavorite: Boolean
+	agreement_id: String
+	bid_price: Float
+	registered: Boolean
+	starting_bid_price: Int
+	favoriteProducts: [FavouriteProducts]
+	productsGalleries: [ProductsGalleries]
+	biddingTickets: [BiddingTickets]
+	productCategory: ProductCategory
+}
