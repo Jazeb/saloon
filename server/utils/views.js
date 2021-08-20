@@ -6,9 +6,13 @@ const sequelize = require('../config/db.connection');
 const { User } = require('../models/index');
 
 // use this function to get data by any key
-const find = ({ table_name, key, value }) => {
+const find = (table_name, key, value) => {
     return new Promise(async (resolve, reject) => {
-        
+        let Model = null;
+        if(table_name == 'USERS') Model = User;
+
+        Model && Model.findOne({ key:value }).then(data => resolve(data))
+        .catch(err => reject(err));
     });
 }
 

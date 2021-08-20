@@ -21,70 +21,26 @@ module.exports = {
 
 
 async function signup(req, res) {
-    let userModel = {
-        first_name: null,
-        last_name: null,
-        email: null,
-        password: null,
-        gender: null,
-        address: null,
-        city: null,
-        latitude: null,
-        longitude: null,
-        phone_number: null,
-        image_url: null,
-        dob: null,
-        is_social_login: false,
-        provider_type: false,
-        provider_key: null,
-    }
 
-    const { first_name, last_name, email, password, phone_number, address, city, gender, dob, latitude, longitude } = req.body;
-    if (_.isEmpty(first_name) || _.isEmpty(last_name) || _.isEmpty(email))
+    const { first_name, last_name, email, password,  } = req.body;
+    if (_.isEmpty(first_name) || _.isEmpty(last_name) || _.isEmpty(email) || _.isEmpty(password))
         return resp.error(res, 'Provide required fields');
 
-    if (!validator.validate(email))
-        return resp.error(res, 'Provide a valid email');
+    if (!validator.validate(email)) return resp.error(res, 'Provide a valid email');
 
     try {
-        let u = await view.find({ table_name: 'USERS', key: 'email', value: email })
-        if (u && !u.is_social_login)
-            return resp.error(res, 'User already exists');
-        // let isValidUser = await userService.validateUser(email);
-        // if (!isValidUser)
-        //     return resp.error(res, 'User already exists');
+        let user = await view.find('USERS', 'email', email);
+        if(!_.isEmpty(user))
+            return resp.error(res, 'User already exists with this email');
 
-        let user = {
-            first_name,
-            last_name,
-            email,
-            phone_number: phone_number || null,
-            password: encryptPassword(password),
-            address: address || null,
-            city: city || null,
-            gender: gender || null,
-            dob: dob || null,
-            latitude: latitude || null,
-            longitude: longitude || null,
-        }
-
-        Object.assign(userModel, user)
-        if (req.files && req.files.image) {
+        if (req.files && req.files.profile_image) {
             let fileName = req.files.image.name.replace(' ', '_').split('.').reverse()[0];
             fileName = '/image_' + Date.now() + '.' + fileName
 
-            let bucketimageInfo = {
-                Bucket: 'ibtekar-assets',
-                contentType: 'image/jpeg',
-                fileName: fileName,
-                file: req.files.image
-            }
-            let uploadedImage = await s3.Upload(bucketimageInfo)
 
-
-            // let dest_url = process.cwd() + '/server/assets/profile_images' + fileName;
-            // req.files.image.mv(dest_url);
-            user.image_url = uploadedImage;
+            let dest_url = process.cwd() + '/server/assets/profile_images' + fileName;
+            req.files.image.mv(dest_url);
+            user.image_url = dest_url;
         }
 
         const new_user = await userService.signup(user);
