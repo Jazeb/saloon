@@ -1,14 +1,13 @@
 require("dotenv").config();
-
 const MYSQL = {
     logs: process.env.MYSQL_LOGS === 'true' ? true : false,
     live: process.env.MYSQL_LIVE, // URL
-    local: process.env.MYSQL_LOCAL, // URL
-    database: process.env.DATABASE,
-    user_local: process.env.MYSQL_USER_LOCAL,
-    user_live: process.env.MYSQL_USER_LIVE,
-    password_live: process.env.MYSQL_PASSWORD_LIVE,
-    password_local: process.env.MYSQL_PASSWORD_LOCAL
+    local: process.env.MYSQL_LOCAL_HOST, // URL
+    database: process.env.MYSQL_DB,
+    user_local: process.env.MYSQL_LOCAL_USER,
+    user_live: process.env.MYSQL_LIVE_USER,
+    password_live: process.env.MYSQL_LIVE_PASSWORD,
+    password_local: process.env.MYSQL_LOCAL_PASSWORD
 };
 
 const CONFIG = {
@@ -31,18 +30,4 @@ const EMAIL = {
     mailerEmailPassword: process.env.MAILER_EMAIL_PASSWORD
 };
 
-const CALLS = {
-    FIRST_1: +process.env.FIRST_1,
-    FIRST_2: +process.env.FIRST_2,
-
-    SECOND_1: +process.env.SECOND_1,
-    SECOND_2: +process.env.SECOND_2,
-
-    FINAL_1: +process.env.FINAL_1,
-    FINAL_2: +process.env.FINAL_2,
-
-    ZERO_1: +process.env.ZERO_1,
-    ZERO_2: +process.env.ZERO_2,
-}
-
-module.exports = { MYSQL, CONFIG, EMAIL, CALLS }
+module.exports = { MYSQL, CONFIG, EMAIL }

@@ -23,6 +23,9 @@ app.use(express.static('server/assets'));
 
 app.use(express.urlencoded({ extended: false, limit: '1kb' }));
 
+app.use('/user', require('../src/routers/user.route'));
+app.use('/services', require('../src/routers/services.route'));
+
 app.use((err, req, res, next) => {
     if (err.status == 404) {
         return res.status(err.status).json({

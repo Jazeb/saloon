@@ -10,47 +10,82 @@ const resp = require('../../config/api.response');
 const view = require('../../utils/views');
 
 module.exports = {
-    signup,
+    login,
     get,
-    update,
+    vendorSignup,
+    getVenderByServiceId,
+    updateUser,
     updatePassword,
     forgotPassword,
     updatePassword,
     resetPassword,
+    placeService
 }
 
 
-async function signup(req, res) {
 
-    const { first_name, last_name, email, password,  } = req.body;
-    if (_.isEmpty(first_name) || _.isEmpty(last_name) || _.isEmpty(email) || _.isEmpty(password))
+async function placeService(req, res) {
+    try {
+        const { lat, long, service_id, sub_service_id } = req.body;
+        if(!lat || !long || !service_id || !sub_service_id)
+            return resp.error(res, 'Provide required fields');
+        
+        const users = await userService.getUserService(service_id, lat, long);
+        return resp.success(res, users);
+        
+    } catch (error) {
+        console.log(error);
+        return resp.error(res, 'Error placing service order');
+    }
+}
+
+async function getVenderByServiceId(req, res) {
+    try {
+        const service_id = req.params.service_id;
+        if(!service_id)
+            return resp.error(res, 'Provide service id');
+    
+        const users = await userService.getVenderByServiceId(service_id);
+        return resp.success(res, users);
+    } catch (error) {
+        console.log(error)
+        resp.error(res, 'Error getting vendors', error);
+    }
+}
+
+async function vendorSignup(req, res) {
+    const { first_name, last_name, email, password, service_id } = req.body;
+    if (_.isEmpty(first_name) || _.isEmpty(last_name) || _.isEmpty(email) || _.isEmpty(password) || !service_id)
         return resp.error(res, 'Provide required fields');
 
     if (!validator.validate(email)) return resp.error(res, 'Provide a valid email');
-
     try {
-        let user = await view.find('USERS', 'email', email);
-        if(!_.isEmpty(user))
+        let validate_user = await view.find('VENDORS', 'email', email);
+        if(!_.isEmpty(validate_user))
             return resp.error(res, 'User already exists with this email');
 
+        const user = req.body;
         if (req.files && req.files.profile_image) {
-            let fileName = req.files.image.name.replace(' ', '_').split('.').reverse()[0];
-            fileName = '/image_' + Date.now() + '.' + fileName
-
+            const image = req.files.profile_image;
+            let fileName = image.name.replace(' ', '_').split('.').reverse()[0];
+            fileName = '/image_' + Date.now() + '.' + fileName;
 
             let dest_url = process.cwd() + '/server/assets/profile_images' + fileName;
-            req.files.image.mv(dest_url);
-            user.image_url = dest_url;
+            image.mv(dest_url);
+            user.image_url = fileName;
         }
+        user.service_id = service_id;
+        user.user_type = 'VENDOR';
+        user.password = encryptPassword(user.password);
 
-        const new_user = await userService.signup(user);
-        new_user.password = null;
-        new_user.created_at = null;
-        new_user.updated_at = null;
+        let new_user = await userService.vendorSignup(user);
+        new_user = new_user.toJSON();
+        delete new_user.password;
+        delete new_user.created_at;
+        delete new_user.updated_at;
 
         const token = generateToken(new_user);
-        new_user.token = token
-        new_user.coins = { coins_count: 0 }
+        new_user.token = token;
         new_user && resp.success(res, new_user);
         return
     } catch (err) {
@@ -79,37 +114,30 @@ async function get(req, res) {
 }
 
 
-async function update(req, res) {
+async function updateUser(req, res) {
     try {
         let should_return = false;
         let params = req.body;
         params.id = req.user.id;
 
-        if (req.files && req.files.image) {
-            const allowedExts = ['png', 'jpg', 'JPG', 'jpeg', 'gif', 'mp4', 'webm', 'mpeg'];
-            const ext = req.files.image.name.replace(' ', '_').split('.').reverse()[0];
+        if (req.files && req.files.profile_image) {
+            const image = req.files.profile_image;
+            const allowedExts = ['png', 'jpg', 'JPG', 'jpeg', 'gif', 'mp4', 'webm', 'mpeg', 'webp'];
+            const ext = image.name.replace(' ', '_').split('.').reverse()[0];
             if (!allowedExts.includes(ext)) {
                 should_return = true;
                 return resp.error(res, 'Invalid file extension');
             }
             let fileName = '/image_' + Date.now() + '.' + ext;
-            // let dest_url = process.cwd() + '/server/assets/profile_images' + fileName;
-            // req.files.image.mv(dest_url);
+            let dest_url = process.cwd() + '/server/assets/profile_images' + fileName;
+            image.mv(dest_url);
 
-            let bucketimageInfo = {
-                Bucket: 'ibtekar-assets',
-                contentType: 'image/jpeg',
-                fileName: fileName,
-                file: req.files.image
-            }
-            let uploadedImage = await s3.Upload(bucketimageInfo)
-
-            params.image_url = uploadedImage;
-            // req.user.image_url && fs.unlink(process.cwd() + '/server/assets/profile_images' + req.user.image_url, (err, data) => err && console.error(err))
-            req.user.image_url = uploadedImage;
+            req.user.image_url && fs.unlink(process.cwd() + '/server/assets/profile_images' + req.user.image_url, (err, data) => err && console.error(err));
+            req.body.image_url = fileName;
         }
         if (should_return) return
-        let user = await userService.updateUser(params);
+        console.log(req.body)
+        let user = await userService.updateUser(req.body);
         user && resp.success(res, user);
         return
     } catch (err) {
@@ -118,7 +146,39 @@ async function update(req, res) {
     }
 }
 
-async function updatePassword(req, res) {
+async function login(req, res) {
+    try {
+        const { email, password } = req.body;
+
+        if (!validator.validate(email))
+            return resp.error(res, 'Provide a valid email');
+
+        if (_.isEmpty(password))
+            return resp.error(res, 'Provide required fields');
+
+        let user = await view.find('USERS', 'email', email);
+        if (_.isEmpty(user))
+            return resp.error(res, 'Invalid user');
+
+        user = user.toJSON();
+
+        let isValid = await isValidPassword(password, user.password);
+        if (!isValid)
+            return resp.error(res, 'Invalid password');
+
+        delete user.password;
+        delete user.created_at;
+        delete user.updated_at;
+        let token = generateToken(user);
+        user.token = token;
+        return resp.success(res, user);
+    } catch (err) {
+        console.error(err)
+        return resp.error(res, 'Something went wrong', err);
+    }
+}
+
+async function resetPassword(req, res) {
     try {
         const { old_password, new_password } = req.body;
         if (_.isEmpty(new_password) || _.isEmpty(old_password))
@@ -140,20 +200,34 @@ async function updatePassword(req, res) {
     }
 }
 
-function resetPassword(req, res) {
+async function updatePassword(req, res) {
 
-    const { new_password, confirm_password, email } = req.body;
-    if (_.isEmpty(new_password) || _.isEmpty(confirm_password) || _.isEmpty(email))
-        return resp.error(res, 'Provide required fields');
+    try {
+        const { old_password, new_password, confirm_password } = req.body;
+        if (_.isEmpty(old_password) ||_.isEmpty(new_password) || _.isEmpty(confirm_password))
+            return resp.error(res, 'Provide required fields');
+    
+        const curr_user = await getUser('id', req.user.id);
+        if(!curr_user)
+            return resp.error(res, 'Invalid id');
 
-    if (new_password !== confirm_password)
-        return resp.error(res, 'Password must match');
+        let isValid = await isValidPassword(old_password, curr_user.password);
+        if(!isValid)
+            return resp.error(res, 'Invalid current password');
 
-    userService.resetPassword(email, new_password).then(_ => resp.success(res, 'Password updated successfully'))
-        .catch(err => {
-            console.error(err);
-            return resp.error(res, 'Error updating password', err);
-        });
+        if (new_password !== confirm_password)
+            return resp.error(res, 'Password must match');
+    
+        userService.resetPassword(curr_user.email, new_password).then(_ => resp.success(res, 'Password updated successfully'))
+            .catch(err => {
+                console.error(err);
+                return resp.error(res, 'Error updating password', err);
+            });
+        
+    } catch (error) {
+        console.error(error);
+        return resp.error(res, 'Error updating password', error);
+    }
 }
 
 async function forgotPassword(req, res) {
@@ -171,4 +245,11 @@ async function forgotPassword(req, res) {
     });
 }
 
-const stringToBoolean = string => string === 'false' ? false : !!string
+function getUser(key, value){
+    return new Promise((resolve, reject) => {
+        view.find('USERS', key, value).then(user => resolve(user))
+        .catch(err => reject(err));
+    });
+}
+
+const stringToBoolean = string => string === 'false' ? false : !!string;

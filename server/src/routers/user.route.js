@@ -7,7 +7,14 @@ const router = express.Router();
 
 router.use('/profileImage', express.static(process.cwd() + '/server/assets/profile_images/'));
 
-router.post('/signup', userCrtl.signup);
+router.post('/vendor/signup', userCrtl.vendorSignup);
+router.get('/vendor/:service_id', userCrtl.getVenderByServiceId);
+// router.post('/customer/signup', userCrtl.customerSignup);
+router.post('/login', userCrtl.login);
+router.put('/update', authenticateUser, userCrtl.updateUser);
+
+
+router.post('/service/place', authenticateUser, userCrtl.placeService);
 
 router.post('/resetPassword', userCrtl.resetPassword);
 router.post('/updatePassword', authenticateUser, userCrtl.updatePassword);

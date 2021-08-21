@@ -1,5 +1,5 @@
 const Sequelize = require('sequelize');
-const { MYSQL, CONFIG } = require('./keys')
+const { MYSQL, CONFIG } = require('./keys');
 
 const mysql_pwd = CONFIG.env == 'DEVELOPMENT' ? MYSQL.password_local : MYSQL.password_live;
 const mysql_host = CONFIG.env == 'DEVELOPMENT' ? MYSQL.local : MYSQL.live;
@@ -27,6 +27,6 @@ sequelize.authenticate()
     .catch(err => console.error('Unable to connect to the database:', err))
 
 
-CONFIG.sync && sequelize.sync({force:true}).then(() => console.log(`Database & tables created!`));
+CONFIG.sync && sequelize.sync({ force:true }).then(() => console.log(`Database & tables created!`));
 
 module.exports = sequelize

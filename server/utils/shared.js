@@ -19,7 +19,7 @@ const verifyToken = token => {
     return new Promise((resolve, reject) => {
         jwt.verify(token, CONFIG.jwtSecret, async (err, result) => {
             if (err) return resolve(false)
-            let user = await views.find({ table_name: 'USERS', key: 'id', value: result.id });
+            let user = await views.find('USERS', 'id', result.id );
             if (_.isEmpty(user)) return resolve(false);
             if (user.is_archived) return resolve(false);
             user = user.toJSON();

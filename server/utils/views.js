@@ -3,15 +3,15 @@ const moment = require('moment');
 const { Op } = require('sequelize');
 
 const sequelize = require('../config/db.connection');
-const { User } = require('../models/index');
+const { Vendors, Service, SubService } = require('../models/index');
 
 // use this function to get data by any key
 const find = (table_name, key, value) => {
     return new Promise(async (resolve, reject) => {
         let Model = null;
-        if(table_name == 'USERS') Model = User;
+        if(table_name == 'VENDORS') Model = Vendors;
 
-        Model && Model.findOne({ key:value }).then(data => resolve(data))
+        Model && Model.findOne({ where:{ [key]:value }}).then(data => resolve(data))
         .catch(err => reject(err));
     });
 }
@@ -23,10 +23,15 @@ const findOne = ({ table_name, where }) => {
     });
 }
 
-const findAll = async model => {
+const findAll = model => {
     return new Promise((resolve, reject) => {
+        let Model = null;
+        if(model == 'SERVICES') Model = Service;
+        
+        const include = [ { model: SubService}]
+        Model.findAll({ include }).then(services => resolve(services))
+        .catch(err => reject(err));
     });
-
 }
 
 const update = async ({ data, where }) => {

@@ -1,7 +1,5 @@
-const moment = require('moment');
-
 module.exports = function (sequelize, DataTypes) {
-    return sequelize.define('users', {
+    return sequelize.define('vendors', {
         id: {
             autoIncrement: true,
             type: DataTypes.INTEGER(11),
@@ -31,7 +29,7 @@ module.exports = function (sequelize, DataTypes) {
         }
     }, {
         sequelize,
-        tableName: 'users',
+        tableName: 'vendors',
         timestamps: false
     });
 }

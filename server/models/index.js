@@ -1,7 +1,21 @@
 const Sequelize = require("sequelize");
+
 const sequelize = require('../config/db.connection');
 const db = { Sequelize, sequelize };
 
-User = require('./users.js')(sequelize, Sequelize);
+Customers = require('./customers.js')(sequelize, Sequelize);
+Vendors = require('./vendors')(sequelize, Sequelize);
+Service = require('./services')(sequelize, Sequelize);
+SubService = require('./sub_services')(sequelize, Sequelize);
 
-module.exports = { db, User };
+Service.hasMany(SubService, {
+    foreignKey: 'service_id',
+    targetKey:'id'
+});
+
+Vendors.belongsTo(Service, {
+    foreignKey: 'service_id',
+    targetKey:'id'
+});
+
+module.exports = { db, Customers, Vendors, Service, SubService };

@@ -3,23 +3,22 @@ const { Op } = require('sequelize');
 const sequelize = require('../../config/db.connection');
 
 const { encryptPassword } = require('../../utils/shared');
-const { User } = require('../../models/index');
+const { User, Vendors, Service } = require('../../models/index');
 
 module.exports = {
-    signup,
+    vendorSignup,
     updateUser,
     validateUser,
     resetPassword,
     updateFirebaseKey,
+    getUserService,
+    getVenderByServiceId
 }
 
-function signup(user) {
-    return new Promise(async (resolve, reject) => {
-        User.create(user)
-            .then(new_user => {
-                addCoinsWallet(new_user.id).then(() => console.log('Wallet created for the user'))
-                return resolve(new_user);
-            })
+function vendorSignup(user) {
+    return new Promise((resolve, reject) => {
+        Vendors.create(user)
+            .then(new_user => resolve(new_user))
             .catch(err => reject(err));
     });
 }
@@ -50,10 +49,6 @@ function updateUser(data) {
     delete data.password
     delete data.updated_at
     delete data.created_at
-    delete data.is_verified
-    delete data.is_social_login
-    delete data.provider_key
-    delete data.provider_type
     delete data.id
 
     return new Promise((resolve, reject) => {
@@ -68,5 +63,21 @@ function updateFirebaseKey(firebase_key, user_id) {
         User.update({ firebase_key }, { where: { id: user_id } })
             .then((result) => result[0] ? resolve(true) : resolve(false))
             .catch(err => reject(err));
+    });
+}
+
+
+function getUserService(service_id) {
+    return new Promise((resolve, reject) => {
+        User.findAll({ where:{ service_id }}).then(users => resolve(users))
+        .catch(err => reject(err));
+    });
+}
+
+function getVenderByServiceId(service_id) {
+    return new Promise((resolve, reject) => {
+        const include = [ { model: Service}]
+        Vendors.findAll({ where:{ service_id }, include}).then(users => resolve(users))
+        .catch(err => reject(err));
     });
 }
