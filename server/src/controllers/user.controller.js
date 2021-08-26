@@ -13,7 +13,7 @@ module.exports = {
     login,
     get,
     vendorSignup,
-    getVenderByServiceId,
+    getVendersByServiceId,
     updateUser,
     updatePassword,
     forgotPassword,
@@ -22,16 +22,23 @@ module.exports = {
     placeService
 }
 
-
-
 async function placeService(req, res) {
     try {
+        const pubsub = require('../../graphql/pubsub');
         const { lat, long, service_id, sub_service_id } = req.body;
         if(!lat || !long || !service_id || !sub_service_id)
             return resp.error(res, 'Provide required fields');
         
-        const users = await userService.getUserService(service_id, lat, long);
-        return resp.success(res, users);
+        // const users = await userService.getUserService(service_id, lat, long);
+        // pubsub.publish('CALL_STATUS', {
+        //     CALL_STATUS: { call, start_time, product, status, call_start_time }
+        // });
+console.log("&&&")
+        pubsub.publish('NEW_JOB_ALERT', {
+            NEW_JOB_ALERT: { service_id, sub_service_id, lat, long }
+        });
+
+        return resp.success(res);
         
     } catch (error) {
         console.log(error);
@@ -39,7 +46,7 @@ async function placeService(req, res) {
     }
 }
 
-async function getVenderByServiceId(req, res) {
+async function getVendersByServiceId(req, res) {
     try {
         const service_id = req.params.service_id;
         if(!service_id)
@@ -48,8 +55,8 @@ async function getVenderByServiceId(req, res) {
         const users = await userService.getVenderByServiceId(service_id);
         return resp.success(res, users);
     } catch (error) {
-        console.log(error)
-        resp.error(res, 'Error getting vendors', error);
+        console.log(error);
+        return resp.error(res, 'Error getting vendors', error);
     }
 }
 

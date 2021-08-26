@@ -8,7 +8,7 @@ const router = express.Router();
 router.use('/profileImage', express.static(process.cwd() + '/server/assets/profile_images/'));
 
 router.post('/vendor/signup', userCrtl.vendorSignup);
-router.get('/vendor/:service_id', userCrtl.getVenderByServiceId);
+router.get('/vendor/:service_id', userCrtl.getVendersByServiceId);
 // router.post('/customer/signup', userCrtl.customerSignup);
 router.post('/login', userCrtl.login);
 router.put('/update', authenticateUser, userCrtl.updateUser);

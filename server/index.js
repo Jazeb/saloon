@@ -23,10 +23,7 @@ const apolloServer = new ApolloServer({
 apolloServer.applyMiddleware({ app });
 apolloServer.installSubscriptionHandlers(http);
 
-http.listen(PORT, async () => {
-    console.log(`Server is running on port ${PORT}, ${ENV} `);
-    return
-});
+http.listen(PORT, _ => console.log(`Server is running on port ${PORT}, ${ENV} `));
 
 
 // const io = require('socket.io').listen(http);
