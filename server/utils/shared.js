@@ -18,17 +18,22 @@ const isValidPassword = (password, user_password) => {
 const verifyToken = token => {
     return new Promise((resolve, reject) => {
         jwt.verify(token, CONFIG.jwtSecret, async (err, result) => {
-            if (err) return resolve(false)
-            let user = await views.find('USERS', 'id', result.id );
-            if (_.isEmpty(user)) return resolve(false);
-            if (user.is_archived) return resolve(false);
-            user = user.toJSON();
-            delete user.password;
-            delete user.firebase_key;
-            delete user.address;
-            return resolve(user);
+            if (err) return resolve(false);
+            return resolve(result);
         });
     });
 }
 
-module.exports = { encryptPassword, generateToken, isValidPassword, verifyToken }
+const validateUser = async token => {
+    try {
+        let user = await views.find(token.user_type, 'id', token.id );
+        if(_.isEmpty(user))
+            return false;
+        return user
+    } catch (err) {
+        console.error(err);
+        return err;
+    }
+}
+
+module.exports = { encryptPassword, generateToken, isValidPassword, verifyToken, validateUser }

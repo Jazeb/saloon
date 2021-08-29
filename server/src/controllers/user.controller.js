@@ -1,6 +1,5 @@
 const _ = require('lodash');
 const fs = require('fs');
-const { Op } = require('sequelize');
 const validator = require("email-validator");
 
 const { encryptPassword, generateToken, isValidPassword } = require('../../utils/shared');
@@ -12,34 +11,119 @@ const view = require('../../utils/views');
 module.exports = {
     login,
     get,
-    vendorSignup,
+    userSignup,
     getVendersByServiceId,
     updateUser,
     updatePassword,
     forgotPassword,
     updatePassword,
     resetPassword,
-    placeService
+    placeService,
+    startService,
+    endService,
+    acceptServiceOrder
+}
+
+async function acceptServiceOrder(req, res) {
+    try {
+        const { order_id, status } = req.body;
+        if (!order_id || !status) return resp.error(res, 'Provide required fields');
+    
+        if (!['ACCEPT', 'REJECT'].includes(status))
+            return resp.error(res, 'Invalid status provided');
+    
+        const order = await view.find('ORDER', 'id', order_id);
+        if (_.isEmpty(order) || order.state !== 'PENDING' || order.status !== 'PENDING')
+            return resp.error(res, 'Invalid order id provided');
+    
+        if (status == 'ACCEPT') {
+            const data = {
+                id: order_id,
+                state: 'ACCEPTED',
+                accepted_by: req.user.id
+            }
+            userService.updateService(data)
+                .then(_ => resp.success(res, 'Order is accepted'))
+                .catch(err => resp.error(res, 'Something went wrong', err));
+        }
+        
+    } catch (error) {
+        console.error(error);
+        return resp.error(res, 'Something went wrong', error);
+    }
+}
+
+async function startService(req, res) {
+    try {
+        const { order_id } = req.body;
+        if (!order_id) return resp.error(res, 'Provide required fields');
+    
+        const order = await view.find('ORDER', 'id', order_id);
+        if (_.isEmpty(order) || order.state !== 'ACCEPTED' || order.status !== 'PENDING')
+            return resp.error(res, 'Invalid order id provided');
+
+        if(order.accepted_by !== req.user.id)
+            return resp.error(res, 'This order is accepted by another vendor');
+
+        const data = {
+            id: order_id,
+            status: 'ONGOING',
+            started_at: Date.now()
+        }
+        userService.updateService(data)
+            .then(_ => resp.success(res, 'Order is started'))
+            .catch(err => resp.error(res, 'Something went wrong', err));
+        
+    } catch (error) {
+        console.error(error);
+        return resp.error(res, 'Something went wrong', error);
+    }
+}
+
+async function endService(req, res) {
+    try {
+        const { order_id } = req.body;
+        if (!order_id) 
+            return resp.error(res, 'Provide required fields');
+    
+        const order = await view.find('ORDER', 'id', order_id);
+        if (_.isEmpty(order) || order.state !== 'ACCEPTED' || order.status !== 'ONGOING')
+            return resp.error(res, 'Invalid order id provided');
+
+        const data = {
+            id: order_id,
+            status: 'COMPLETED',
+            completed_at: Date.now()
+        }
+        userService.updateService(data)
+            .then(_ => resp.success(res, 'Order is completed'))
+            .catch(err => resp.error(res, 'Something went wrong', err));
+        
+    } catch (error) {
+        console.error(error);
+        return resp.error(res, 'Something went wrong', error);
+    }
 }
 
 async function placeService(req, res) {
     try {
+        console.log(req.body);
         const pubsub = require('../../graphql/pubsub');
         const { lat, long, service_id, sub_service_id } = req.body;
-        if(!lat || !long || !service_id || !sub_service_id)
+        if (!lat || !long || !service_id || !sub_service_id)
             return resp.error(res, 'Provide required fields');
-        
-        // const users = await userService.getUserService(service_id, lat, long);
-        // pubsub.publish('CALL_STATUS', {
-        //     CALL_STATUS: { call, start_time, product, status, call_start_time }
-        // });
-console.log("&&&")
-        pubsub.publish('NEW_JOB_ALERT', {
-            NEW_JOB_ALERT: { service_id, sub_service_id, lat, long }
-        });
 
-        return resp.success(res);
-        
+        const order_data = { lat, long, service_id, sub_service_id };
+
+        order_data.user_id = req.user.id;
+        const service_data = await userService.saveService(order_data);
+
+
+        pubsub.publish('NEW_JOB_ALERT', {
+            NEW_JOB_ALERT: { service_id, sub_service_id, lat, long, order_id: service_data.id }
+        });
+        return resp.success(res, order_data, 'Service posted');
+
     } catch (error) {
         console.log(error);
         return resp.error(res, 'Error placing service order');
@@ -49,9 +133,9 @@ console.log("&&&")
 async function getVendersByServiceId(req, res) {
     try {
         const service_id = req.params.service_id;
-        if(!service_id)
+        if (!service_id)
             return resp.error(res, 'Provide service id');
-    
+
         const users = await userService.getVenderByServiceId(service_id);
         return resp.success(res, users);
     } catch (error) {
@@ -60,15 +144,17 @@ async function getVendersByServiceId(req, res) {
     }
 }
 
-async function vendorSignup(req, res) {
+async function userSignup(req, res) {
     const { first_name, last_name, email, password, service_id } = req.body;
-    if (_.isEmpty(first_name) || _.isEmpty(last_name) || _.isEmpty(email) || _.isEmpty(password) || !service_id)
+    if (_.isEmpty(first_name) || _.isEmpty(last_name) || _.isEmpty(email) || _.isEmpty(password))
         return resp.error(res, 'Provide required fields');
 
     if (!validator.validate(email)) return resp.error(res, 'Provide a valid email');
     try {
-        let validate_user = await view.find('VENDORS', 'email', email);
-        if(!_.isEmpty(validate_user))
+
+        const model = req.url == '/vendor/signup' ? 'VENDOR' : 'CUSTOMER';
+        let validate_user = await view.find(model, 'email', email);
+        if (!_.isEmpty(validate_user))
             return resp.error(res, 'User already exists with this email');
 
         const user = req.body;
@@ -81,12 +167,14 @@ async function vendorSignup(req, res) {
             image.mv(dest_url);
             user.image_url = fileName;
         }
-        user.service_id = service_id;
-        user.user_type = 'VENDOR';
-        user.password = encryptPassword(user.password);
 
-        let new_user = await userService.vendorSignup(user);
+        // user.service_id = service_id;
+        user.password = encryptPassword(user.password);
+        delete user.service_id
+
+        let new_user = model == 'VENDOR' ? await userService.vendorSignup(user) : await userService.customerSignup(user);
         new_user = new_user.toJSON();
+        new_user.user_type = model;
         delete new_user.password;
         delete new_user.created_at;
         delete new_user.updated_at;
@@ -163,7 +251,8 @@ async function login(req, res) {
         if (_.isEmpty(password))
             return resp.error(res, 'Provide required fields');
 
-        let user = await view.find('USERS', 'email', email);
+        const model = req.url == '/vendor/login' ? 'VENDOR' : 'CUSTOMER';
+        let user = await view.find(model, 'email', email);
         if (_.isEmpty(user))
             return resp.error(res, 'Invalid user');
 
@@ -176,6 +265,8 @@ async function login(req, res) {
         delete user.password;
         delete user.created_at;
         delete user.updated_at;
+
+        user.user_type = model;
         let token = generateToken(user);
         user.token = token;
         return resp.success(res, user);
@@ -211,26 +302,26 @@ async function updatePassword(req, res) {
 
     try {
         const { old_password, new_password, confirm_password } = req.body;
-        if (_.isEmpty(old_password) ||_.isEmpty(new_password) || _.isEmpty(confirm_password))
+        if (_.isEmpty(old_password) || _.isEmpty(new_password) || _.isEmpty(confirm_password))
             return resp.error(res, 'Provide required fields');
-    
+
         const curr_user = await getUser('id', req.user.id);
-        if(!curr_user)
+        if (!curr_user)
             return resp.error(res, 'Invalid id');
 
         let isValid = await isValidPassword(old_password, curr_user.password);
-        if(!isValid)
+        if (!isValid)
             return resp.error(res, 'Invalid current password');
 
         if (new_password !== confirm_password)
             return resp.error(res, 'Password must match');
-    
+
         userService.resetPassword(curr_user.email, new_password).then(_ => resp.success(res, 'Password updated successfully'))
             .catch(err => {
                 console.error(err);
                 return resp.error(res, 'Error updating password', err);
             });
-        
+
     } catch (error) {
         console.error(error);
         return resp.error(res, 'Error updating password', error);
@@ -252,10 +343,10 @@ async function forgotPassword(req, res) {
     });
 }
 
-function getUser(key, value){
+function getUser(key, value) {
     return new Promise((resolve, reject) => {
         view.find('USERS', key, value).then(user => resolve(user))
-        .catch(err => reject(err));
+            .catch(err => reject(err));
     });
 }
 

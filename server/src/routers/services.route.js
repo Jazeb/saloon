@@ -7,7 +7,7 @@ const router = express.Router();
 
 router.use('/profileImage', express.static(process.cwd() + '/server/assets/profile_images/'));
 
-router.get('/', authenticateUser, servicesCrtl.getServices);
+router.get('/', servicesCrtl.getServices);
 
 
 module.exports = router

@@ -3,21 +3,32 @@ const { Op } = require('sequelize');
 const sequelize = require('../../config/db.connection');
 
 const { encryptPassword } = require('../../utils/shared');
-const { User, Vendors, Service } = require('../../models/index');
+const { User, Customers, Vendors, Service, ServiceOrders } = require('../../models/index');
 
 module.exports = {
     vendorSignup,
+    customerSignup,
     updateUser,
     validateUser,
     resetPassword,
     updateFirebaseKey,
     getUserService,
+    saveService,
+    updateService,
     getVenderByServiceId
 }
 
 function vendorSignup(user) {
     return new Promise((resolve, reject) => {
         Vendors.create(user)
+            .then(new_user => resolve(new_user))
+            .catch(err => reject(err));
+    });
+}
+
+function customerSignup(user) {
+    return new Promise((resolve, reject) => {
+        Customers.create(user)
             .then(new_user => resolve(new_user))
             .catch(err => reject(err));
     });
@@ -69,15 +80,39 @@ function updateFirebaseKey(firebase_key, user_id) {
 
 function getUserService(service_id) {
     return new Promise((resolve, reject) => {
-        User.findAll({ where:{ service_id }}).then(users => resolve(users))
-        .catch(err => reject(err));
+        User.findAll({ where: { service_id } }).then(users => resolve(users))
+            .catch(err => reject(err));
     });
 }
 
 function getVenderByServiceId(service_id) {
     return new Promise((resolve, reject) => {
-        const include = [ { model: Service}]
-        Vendors.findAll({ where:{ service_id }, include}).then(users => resolve(users))
-        .catch(err => reject(err));
+        const include = [{ model: Service }]
+        Vendors.findAll({ where: { service_id }, include }).then(users => resolve(users))
+            .catch(err => reject(err));
+    });
+}
+
+
+// save the service data
+function saveService(body) {
+    return new Promise((resolve, reject) => {
+        ServiceOrders.create(body)
+            .then(data => {
+                console.log(data);
+                return resolve(data);
+            })
+            .catch(err => reject(err));
+    });
+}
+
+function updateService(data) {
+    return new Promise((resolve, reject) => {
+        const id = data.id;
+        delete data.id;
+
+        ServiceOrders.update(data, { where: { id } })
+            .then(_ => resolve(true))
+            .catch(err => reject(err));
     });
 }

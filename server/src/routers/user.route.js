@@ -1,24 +1,31 @@
 const express = require('express');
 
-const authenticateUser = require("../../config/auth");
+const { authCustomer, authVendor } = require("../../config/auth");
 const userCrtl = require('../controllers/user.controller');
 const router = express.Router();
 
 
 router.use('/profileImage', express.static(process.cwd() + '/server/assets/profile_images/'));
 
-router.post('/vendor/signup', userCrtl.vendorSignup);
+
+// vendor APIs
+router.post('/vendor/signup', userCrtl.userSignup);
 router.get('/vendor/:service_id', userCrtl.getVendersByServiceId);
-// router.post('/customer/signup', userCrtl.customerSignup);
-router.post('/login', userCrtl.login);
-router.put('/update', authenticateUser, userCrtl.updateUser);
+router.post('/vendor/login', userCrtl.login);
+router.put('/update', authVendor, userCrtl.updateUser);
+router.post('/vendor/order/accept', authVendor, userCrtl.acceptServiceOrder);
+router.post('/vendor/order/start', authVendor, userCrtl.startService);
+router.post('/vendor/order/end', authVendor, userCrtl.endService);
 
 
-router.post('/service/place', authenticateUser, userCrtl.placeService);
+// customer APIs
+router.post('/customer/signup', userCrtl.userSignup);
+router.post('/customer/login', userCrtl.login);
+router.post('/customer/service/place', authCustomer, userCrtl.placeService);
 
 router.post('/resetPassword', userCrtl.resetPassword);
-router.post('/updatePassword', authenticateUser, userCrtl.updatePassword);
+router.post('/updatePassword', authCustomer, userCrtl.updatePassword);
 router.post('/forgotPassword', userCrtl.forgotPassword);
 
 
-module.exports = router
+module.exports = router;

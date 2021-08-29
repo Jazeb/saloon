@@ -7,9 +7,9 @@ INSERT INTO `services`
 
 INSERT INTO `sub_services`
 (`sub_service_name`, `service_id`) VALUES 
-(`Hair Cut`, 1),
-(`Shave, Beard`, 2),
-(`Hair Styling`, 3);
+('Hair Cut', 1),
+('Shave, Beard', 2),
+('Hair Styling', 3);
 
 
 
