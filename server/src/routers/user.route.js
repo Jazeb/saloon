@@ -17,15 +17,17 @@ router.post('/vendor/order/accept', authVendor, userCrtl.acceptServiceOrder);
 router.post('/vendor/order/start', authVendor, userCrtl.startService);
 router.post('/vendor/order/end', authVendor, userCrtl.endService);
 
+router.post('/vendor/changePassword', authVendor, userCrtl.changePassword);
+router.post('/vendor/forgotPassword', userCrtl.forgotPassword);
+
 
 // customer APIs
 router.post('/customer/signup', userCrtl.userSignup);
 router.post('/customer/login', userCrtl.login);
 router.post('/customer/service/place', authCustomer, userCrtl.placeService);
 
-router.post('/resetPassword', userCrtl.resetPassword);
-router.post('/updatePassword', authCustomer, userCrtl.updatePassword);
-router.post('/forgotPassword', userCrtl.forgotPassword);
+router.post('/customer/changePassword', authCustomer, userCrtl.changePassword);
+router.post('/customer/forgotPassword', userCrtl.forgotPassword);
 
 
 module.exports = router;
