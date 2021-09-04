@@ -14,10 +14,8 @@ module.exports = {
     userSignup,
     getVendersByServiceId,
     updateUser,
-    updatePassword,
+    changePassword,
     forgotPassword,
-    updatePassword,
-    resetPassword,
     placeService,
     startService,
     endService,
@@ -281,7 +279,7 @@ async function login(req, res) {
     }
 }
 
-async function resetPassword(req, res) {
+/*async function resetPassword(req, res) {
     try {
         const { old_password, new_password } = req.body;
         if (_.isEmpty(new_password) || _.isEmpty(old_password))
@@ -301,16 +299,17 @@ async function resetPassword(req, res) {
         console.error(err)
         return resp.error(res, 'Error updating password', err)
     }
-}
+}*/
 
-async function updatePassword(req, res) {
+async function changePassword(req, res) {
 
     try {
         const { old_password, new_password, confirm_password } = req.body;
         if (_.isEmpty(old_password) || _.isEmpty(new_password) || _.isEmpty(confirm_password))
             return resp.error(res, 'Provide required fields');
 
-        const curr_user = await getUser('id', req.user.id);
+        const table_name = req.url == '/vendor/changePassword' ? 'vendors' : 'customers';
+        const curr_user = await getUser('id', req.user.id, table_name);
         if (!curr_user)
             return resp.error(res, 'Invalid id');
 
@@ -334,23 +333,30 @@ async function updatePassword(req, res) {
 }
 
 async function forgotPassword(req, res) {
-    const { email } = req.body;
-    if (_.isEmpty(email))
-        return resp.error(res, 'Provide email');
-
-    const user = await view.find({ table_name: 'USERS', key: 'email', value: email });
-    if (_.isEmpty(user) || user.is_social_login)
-        return resp.error(res, 'Invalid user email');
-
-    mailer.sendForgotEmail(user).then(_ => resp.success(res, 'Email sent successfully')).catch(err => {
-        console.error(err);
-        return resp.error(res, 'Error sending email', err);
-    });
+    try {
+        const { email } = req.body;
+        if (_.isEmpty(email))
+            return resp.error(res, 'Provide email');
+    
+        const table_name = req.url == '/vendor/forgotPassword' ? 'vendors' : 'customers';
+        const curr_user = await getUser('email', email, table_name);
+        if (!curr_user)
+            return resp.error(res, 'Invalid email');
+    
+        mailer.sendForgotEmail(user).then(_ => resp.success(res, 'Email sent successfully')).catch(err => {
+            console.error(err);
+            return resp.error(res, 'Error sending email', err);
+        });
+        
+    } catch (error) {
+        console.error(error);
+        return resp.error(res, 'Error sending email', error);
+    }
 }
 
-function getUser(key, value) {
+function getUser(key, value, table_name) {
     return new Promise((resolve, reject) => {
-        view.find('USERS', key, value).then(user => resolve(user))
+        view.find(table_name, key, value).then(user => resolve(user))
             .catch(err => reject(err));
     });
 }
