@@ -1,5 +1,5 @@
 module.exports = function (sequelize, DataTypes) {
-    return sequelize.define('customer_reviews', {
+    return sequelize.define('customers_reviews', {
         id: {
             autoIncrement: true,
             type: DataTypes.INTEGER(11),
@@ -10,13 +10,17 @@ module.exports = function (sequelize, DataTypes) {
             type: DataTypes.INTEGER(7),
             allowNull: false
         },
-        review_msg: {
+        order_id: {
+            type: DataTypes.INTEGER(11),
+            allowNull: false
+        },
+        review: {
             type: DataTypes.STRING(255),
             allowNull: true
         },
     }, {
         sequelize,
-        tableName: 'customer_reviews',
+        tableName: 'customers_reviews',
         timestamps: false
     });
 }

@@ -1,9 +1,7 @@
 const _ = require('lodash');
-const { Op } = require('sequelize');
-const sequelize = require('../../config/db.connection');
 
 const { encryptPassword } = require('../../utils/shared');
-const { User, Customers, Vendors, Service, ServiceOrders } = require('../../models/index');
+const { User, Customers, Vendors, Service, ServiceOrders, VendorsReviews, CustomersReviews, Notifications } = require('../../models/index');
 
 module.exports = {
     vendorSignup,
@@ -15,7 +13,11 @@ module.exports = {
     getUserService,
     saveService,
     updateService,
-    getVenderByServiceId
+    getVenderByServiceId,
+    addVendorReview,
+    addCustomerReview,
+    addCustomerNotification,
+    addVendorNotification
 }
 
 function vendorSignup(user) {
@@ -112,6 +114,40 @@ function updateService(data) {
         delete data.id;
 
         ServiceOrders.update(data, { where: { id } })
+            .then(_ => resolve(true))
+            .catch(err => reject(err));
+    });
+}
+
+function addVendorReview(data) {
+    return new Promise((resolve, reject) => {
+        VendorsReviews.create(data)
+            .then(_ => resolve(true))
+            .catch(err => reject(err));
+    });
+}
+
+function addCustomerReview(data) {
+    return new Promise((resolve, reject) => {
+        CustomersReviews.create(data)
+            .then(_ => resolve(true))
+            .catch(err => reject(err));
+    });
+}
+
+function addVendorNotification(data) {
+    return new Promise((resolve, reject) => {
+        const message = 'You order has been completed';
+        Notifications.create({ message, user_type:'VENDOR' })
+            .then(_ => resolve(true))
+            .catch(err => reject(err));
+    });
+}
+
+function addCustomerNotification(data) {
+    return new Promise((resolve, reject) => {
+        const message = 'You job has been completed';
+        Notifications.create({ message, user_type:'CUSTOMER' })
             .then(_ => resolve(true))
             .catch(err => reject(err));
     });

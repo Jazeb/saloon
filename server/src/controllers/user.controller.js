@@ -21,32 +21,34 @@ module.exports = {
     placeService,
     startService,
     endService,
-    acceptServiceOrder
+    acceptServiceOrder,
+    submitReview
 }
 
 async function acceptServiceOrder(req, res) {
     try {
         const { order_id, status } = req.body;
         if (!order_id || !status) return resp.error(res, 'Provide required fields');
-    
+
         if (!['ACCEPT', 'REJECT'].includes(status))
             return resp.error(res, 'Invalid status provided');
-    
+
         const order = await view.find('ORDER', 'id', order_id);
         if (_.isEmpty(order) || order.state !== 'PENDING' || order.status !== 'PENDING')
             return resp.error(res, 'Invalid order id provided');
-    
+
         if (status == 'ACCEPT') {
             const data = {
                 id: order_id,
                 state: 'ACCEPTED',
-                accepted_by: req.user.id
+                accepted_by: req.user.id,
+                vendor_id: req.user.id
             }
             userService.updateService(data)
                 .then(_ => resp.success(res, 'Order is accepted'))
                 .catch(err => resp.error(res, 'Something went wrong', err));
         }
-        
+
     } catch (error) {
         console.error(error);
         return resp.error(res, 'Something went wrong', error);
@@ -57,12 +59,12 @@ async function startService(req, res) {
     try {
         const { order_id } = req.body;
         if (!order_id) return resp.error(res, 'Provide required fields');
-    
+
         const order = await view.find('ORDER', 'id', order_id);
         if (_.isEmpty(order) || order.state !== 'ACCEPTED' || order.status !== 'PENDING')
             return resp.error(res, 'Invalid order id provided');
 
-        if(order.accepted_by !== req.user.id)
+        if (order.accepted_by !== req.user.id)
             return resp.error(res, 'This order is accepted by another vendor');
 
         const data = {
@@ -73,7 +75,7 @@ async function startService(req, res) {
         userService.updateService(data)
             .then(_ => resp.success(res, 'Order is started'))
             .catch(err => resp.error(res, 'Something went wrong', err));
-        
+
     } catch (error) {
         console.error(error);
         return resp.error(res, 'Something went wrong', error);
@@ -81,11 +83,12 @@ async function startService(req, res) {
 }
 
 async function endService(req, res) {
+    // Complete the current order
     try {
         const { order_id } = req.body;
-        if (!order_id) 
+        if (!order_id)
             return resp.error(res, 'Provide required fields');
-    
+
         const order = await view.find('ORDER', 'id', order_id);
         if (_.isEmpty(order) || order.state !== 'ACCEPTED' || order.status !== 'ONGOING')
             return resp.error(res, 'Invalid order id provided');
@@ -99,6 +102,8 @@ async function endService(req, res) {
             .then(_ => resp.success(res, 'Order is completed'))
             .catch(err => resp.error(res, 'Something went wrong', err));
         
+        await userService.addVendorNotification();
+
     } catch (error) {
         console.error(error);
         return resp.error(res, 'Something went wrong', error);
@@ -107,7 +112,6 @@ async function endService(req, res) {
 
 async function placeService(req, res) {
     try {
-        console.log(req.body);
         const pubsub = require('../../graphql/pubsub');
         const { lat, long, service_id, sub_service_id } = req.body;
         if (!lat || !long || !service_id || !sub_service_id)
@@ -115,7 +119,8 @@ async function placeService(req, res) {
 
         const order_data = { lat, long, service_id, sub_service_id };
 
-        order_data.user_id = req.user.id;
+        order_data['customer_id'] = req.user.id;
+
         const service_data = await userService.saveService(order_data);
 
 
@@ -348,6 +353,39 @@ function getUser(key, value) {
         view.find('USERS', key, value).then(user => resolve(user))
             .catch(err => reject(err));
     });
+}
+
+function submitReview(req, res) {
+    try {
+        const { stars, review, order_id } = req.body;
+        if (!stars || !review || !order_id)
+            return resp.error(res, 'Provide required fields');
+
+        const data = { stars, review, order_id };
+        const { user_type } = req.user;
+
+        // const order = await view.find('ORDER', 'id', id);
+
+        data['order_id'] = order_id;
+        // data['customer_id'] = order.customer_id;
+        user_type == 'VENDOR' ? data['customer_id'] = req.user.id : data['vendor_id'] = req.user.id;
+
+
+        if (user_type == 'VENDOR') {
+            userService.addCustomerReview(data)
+                .then(_ => resp.success(res, 'Reviews submitted successfully'))
+                .catch(err => resp.error(res, 'Error submitting review', err));
+        }
+        else {
+            userService.addVendorReview(data)
+                .then(_ => resp.success(res, 'Reviews submitted successfully'))
+                .catch(err => resp.error(res, 'Error submitting review', err));
+        }
+
+    } catch (error) {
+        console.error(error);
+        return resp.error(res, 'Error addming review', error);
+    }
 }
 
 const stringToBoolean = string => string === 'false' ? false : !!string;

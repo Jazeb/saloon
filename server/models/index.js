@@ -8,14 +8,18 @@ Service = require('./services')(sequelize, Sequelize);
 Customers = require('./customers.js')(sequelize, Sequelize);
 SubService = require('./sub_services')(sequelize, Sequelize);
 ServiceOrders = require('./services_orders')(sequelize, Sequelize);
+VendorsReviews = require('./vendor_reviews')(sequelize, Sequelize);
+CustomersReviews = require('./customer_reviews')(sequelize, Sequelize);
+Notifications = require('./notifications')(sequelize, Sequelize);
 
 Service.hasMany(SubService, {
     foreignKey: 'service_id',
     targetKey:'id'
 });
 
-Vendors.belongsTo(Service, {
-    foreignKey: 'service_id',
+// Customers relationships
+Customers.hasMany(CustomersReviews, {
+    foreignKey: 'customer_id',
     targetKey:'id'
 });
 
@@ -24,9 +28,25 @@ Customers.hasMany(ServiceOrders, {
     targetKey:'id'
 });
 
+// ServiceOrders.hasOne(CustomersReviews, {
+//     foreignKey: 'customer_id',
+//     targetKey:'id'
+// })
+
+// Vendors relationships
 Vendors.hasMany(ServiceOrders, {
     foreignKey: 'vendor_id',
     targetKey:'id'
 });
 
-module.exports = { db, Customers, Vendors, Service, SubService, ServiceOrders };
+Vendors.hasMany(VendorsReviews, {
+    foreignKey: 'vendor_id',
+    targetKey:'id'
+});
+
+Vendors.belongsTo(Service, {
+    foreignKey: 'service_id',
+    targetKey:'id'
+});
+
+module.exports = { db, Customers, Vendors, Service, SubService, ServiceOrders, CustomersReviews, VendorsReviews, Notifications };

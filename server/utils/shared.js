@@ -29,6 +29,7 @@ const validateUser = async token => {
         let user = await views.find(token.user_type, 'id', token.id );
         if(_.isEmpty(user))
             return false;
+        user.user_type = token.user_type;
         return user
     } catch (err) {
         console.error(err);
