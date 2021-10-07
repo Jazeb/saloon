@@ -64,7 +64,7 @@ async function getCustomers(req, res) {
     }
 }
 
-function updateCustomers(req, res) {
+async function updateCustomers(req, res) {
     try {
         const data = req.body;
         const customers = await userService.updateCustomers(data);
@@ -85,7 +85,7 @@ async function getVendors(req, res) {
     }
 }
 
-function updateVendors(req, res) {
+async function updateVendors(req, res) {
     try {
         const data = req.body;
         const vendros = await userService.updateVendros(data);
@@ -106,7 +106,7 @@ async function getOrders(req, res) {
     }
 }
 
-function updateOrders(req, res) {
+async function updateOrders(req, res) {
     try {
         const data = req.body;
         const vendros = await userService.updateOrders(data);
@@ -129,7 +129,7 @@ async function getServices(req, res) {
     }
 }
 
-function updateService(req, res) {
+async function updateService(req, res) {
     try {
         const data = req.body;
         const updated = await userService.updateService(data);
@@ -140,7 +140,7 @@ function updateService(req, res) {
     }
 }
 
-function addService(req, res) {
+async function addService(req, res) {
     try {
         const data = req.body;
         const added = await userService.addService(data);
