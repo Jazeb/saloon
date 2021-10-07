@@ -1,11 +1,12 @@
 const Sequelize = require('sequelize');
 const { MYSQL, CONFIG } = require('./keys');
 
-const mysql_pwd = CONFIG.env == 'DEVELOPMENT' ? MYSQL.password_local : MYSQL.password_live;
-const mysql_host = CONFIG.env == 'DEVELOPMENT' ? MYSQL.local : MYSQL.live;
-const mysql_user = CONFIG.env == 'DEVELOPMENT' ? MYSQL.user_local : MYSQL.user_live;
+const mysql_pwd = process.env.MYSQL_LOCAL_PASSWORD;//CONFIG.env == 'DEVELOPMENT' ? MYSQL.password_local : MYSQL.password_live;
+const mysql_host = 'localhost';//CONFIG.env == 'DEVELOPMENT' ? MYSQL.local : MYSQL.live;
+const mysql_user = process.env.MYSQL_LOCAL_USER;//CONFIG.env == 'DEVELOPMENT' ? MYSQL.user_local : MYSQL.user_live;
+const DATABASE = process.env.DATABASE;
 
-const sequelize = new Sequelize(MYSQL.database, mysql_user, mysql_pwd, {
+const sequelize = new Sequelize(DATABASE, mysql_user, mysql_pwd, {
     host: mysql_host,
     dialect: 'mysql',
     operatorsAliases: 0,
