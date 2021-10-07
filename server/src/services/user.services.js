@@ -1,9 +1,19 @@
 const _ = require('lodash');
 
 const { encryptPassword } = require('../../utils/shared');
-const { User, Customers, Vendors, Service, ServiceOrders, VendorsReviews, CustomersReviews, Notifications } = require('../../models/index');
+const { User, Customers, Vendors, Service, ServiceOrders, VendorsReviews, CustomersReviews, Notifications, Orders } = require('../../models/index');
+
 
 module.exports = {
+    getCustomers,
+    updateCustomers,
+    getVendors,
+    updateVendors,
+    getOrders,
+    getServices,
+    updateService,
+    addService,
+    updateOrders,
     vendorSignup,
     customerSignup,
     updateUser,
@@ -149,6 +159,93 @@ function addCustomerNotification(data) {
         const message = 'You job has been completed';
         Notifications.create({ message, user_type:'CUSTOMER' })
             .then(_ => resolve(true))
+            .catch(err => reject(err));
+    });
+}
+
+
+
+// CUSTOMERS CRUD
+function getCustomers() {
+    return new Promise((resolve, reject) => {
+        Customers.findAll()
+            .then(customers => resolve(customers))
+            .catch(err => reject(err));
+    })
+}
+
+function updateCustomers(data) {
+    return new Promise((resolve, reject) => {
+        let id = data.id;
+        delete data.id;
+        Customers.update(data, { where:{ id }})
+            .then(customers => resolve(customers))
+            .catch(err => reject(err));
+    });
+}
+
+// VENDORS CRUD
+function getVendors() {
+    return new Promise((resolve, reject) => {
+        Vendors.findAll()
+            .then(vendors => resolve(vendors))
+            .catch(err => reject(err));
+    })
+}
+
+function updateVendors(data) {
+    return new Promise((resolve, reject) => {
+        let id = data.id;
+        delete data.id;
+        Vendors.update(data, { where:{ id }})
+            .then(vendors => resolve(vendors))
+            .catch(err => reject(err));
+    });
+}
+
+// ORDERS CRUD
+function getOrders() {
+    return new Promise((resolve, reject) => {
+        Orders.findAll()
+            .then(orders => resolve(orders))
+            .catch(err => reject(err));
+    });
+}
+
+function updateOrders(data) {
+    return new Promise((resolve, reject) => {
+        let id = data.id;
+        delete data.id;
+        Orders.update(data, { where:{ id }})
+            .then(orders => resolve(orders))
+            .catch(err => reject(err));
+    });
+}
+
+
+// Services CRUD
+function getServices() {
+    return new Promise((resolve, reject) => {
+        Service.findAll()
+            .then(services => resolve(services))
+            .catch(err => reject(err));
+    });
+}
+
+function updateService(data) {
+    return new Promise((resolve, reject) => {
+        let id = data.id;
+        delete data.id;
+        Service.update(data, { where:{ id }})
+            .then(services => resolve(services))
+            .catch(err => reject(err));
+    });
+}
+
+function addService(data) {
+    return new Promise((resolve, reject) => {
+        Service.add(data)
+            .then(services => resolve(services))
             .catch(err => reject(err));
     });
 }

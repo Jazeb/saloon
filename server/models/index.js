@@ -11,6 +11,7 @@ ServiceOrders = require('./services_orders')(sequelize, Sequelize);
 VendorsReviews = require('./vendor_reviews')(sequelize, Sequelize);
 CustomersReviews = require('./customer_reviews')(sequelize, Sequelize);
 Notifications = require('./notifications')(sequelize, Sequelize);
+Admin = require('./admin')(sequelize, Sequelize);
 
 Service.hasMany(SubService, {
     foreignKey: 'service_id',
@@ -49,4 +50,4 @@ Vendors.belongsTo(Service, {
     targetKey:'id'
 });
 
-module.exports = { db, Customers, Vendors, Service, SubService, ServiceOrders, CustomersReviews, VendorsReviews, Notifications };
+module.exports = { db, Admin, Customers, Vendors, Service, SubService, ServiceOrders, CustomersReviews, VendorsReviews, Notifications };

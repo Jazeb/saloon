@@ -6,8 +6,6 @@ const cors = require('cors');
 
 const app = express();
 
-const { CONFIG } = require('../config/keys');
-
 app.get('/favicon.ico', (req, res) => res.status(200))
 app.get('/status', (req, res) => res.status(200).json({ status: true, message: 'server is running' }))
 
@@ -25,6 +23,7 @@ app.use(express.urlencoded({ extended: false, limit: '1kb' }));
 
 app.use('/user', require('../src/routers/user.route'));
 app.use('/services', require('../src/routers/services.route'));
+app.use('/admin', require('../src/routers/admin.route'));
 
 app.use((err, req, res, next) => {
     if (err.status == 404) {

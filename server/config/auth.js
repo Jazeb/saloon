@@ -1,6 +1,26 @@
 const _ = require('lodash');
-const { CONFIG } = require("../config/keys");
 const { verifyToken, validateUser } = require('../utils/shared');
+
+const authAdmin = async (req, res, next) => {
+    try {
+        const authHeader = req.headers['authorization'];
+        const auth_token = authHeader && authHeader.split(' ')[1];
+        if (auth_token == null) return res.sendStatus(401);
+    
+        const token = await verifyToken(auth_token);
+        if (!token || !token.is_admin) return res.sendStatus(401);
+    
+        // const user = await validateUser(token);
+        // if (!user) return res.sendStatus(401);
+        req.user = token;
+        next();
+        
+    } catch (error) {
+        console.error(error);
+        res.sendStatus(500);
+        return
+    }
+}
 
 const authCustomer = async (req, res, next) => {
     try {
@@ -42,4 +62,4 @@ const authVendor = async (req, res, next) => {
     }
 }
 
-module.exports = { authCustomer, authVendor };
+module.exports = { authCustomer, authVendor, authAdmin };

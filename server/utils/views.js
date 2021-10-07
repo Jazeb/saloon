@@ -3,7 +3,7 @@ const moment = require('moment');
 const { Op } = require('sequelize');
 
 const sequelize = require('../config/db.connection');
-const { Vendors, Service, SubService, Customers, ServiceOrders } = require('../models/index');
+const { Vendors, Service, SubService, Customers, ServiceOrders, Admin } = require('../models/index');
 
 // use this function to get data by any key
 const find = (table_name, key, value) => {
@@ -12,6 +12,7 @@ const find = (table_name, key, value) => {
         if(table_name == 'VENDOR') Model = Vendors;
         if(table_name == 'CUSTOMER') Model = Customers;
         if(table_name == 'ORDER') Model = ServiceOrders;
+        if(table_name == 'ADMIN') Model = Admin;
         !Model && console.error('Invalid model name');
 
         Model && Model.findOne({ where:{ [key]:value }}).then(data => resolve(data))
