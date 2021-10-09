@@ -24,8 +24,8 @@ const sequelize = new Sequelize(DATABASE, mysql_user, mysql_pwd, {
 
 
 sequelize.authenticate()
-    .then(() => console.log(`DB ${MYSQL.database} connected on: ${mysql_host}, user:${mysql_user}`))
-    .catch(err => console.error('Unable to connect to the database:', err))
+    .then(() => console.log(`DB ${DATABASE} connected on: ${mysql_host}, user:${mysql_user}`))
+    .catch(err => console.error('Unable to connect to the database:', err));
 
 
 CONFIG.sync && sequelize.sync({ force:true }).then(() => console.log(`Database & tables created!`));

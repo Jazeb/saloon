@@ -1,10 +1,10 @@
 const { ApolloServer } = require('apollo-server-express');
 
-const schemaWithResolvers = require('./graphql/index');
-const { CONFIG } = require("./config/keys");
+const schemaWithResolvers = require('./server/graphql/index');
+const { CONFIG } = require("./server/config/keys");
 
 
-const app = require("./config/express");
+const app = require("./server/config/express");
 const PORT = CONFIG.port || 3001;
 const ENV = CONFIG.env;
 

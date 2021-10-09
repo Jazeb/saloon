@@ -1,7 +1,7 @@
 const _ = require('lodash');
 
 const { encryptPassword } = require('../../utils/shared');
-const { User, Customers, Vendors, Service, ServiceOrders, VendorsReviews, CustomersReviews, Notifications, Orders } = require('../../models/index');
+const { User, Customers, Vendors, Service, SubService, ServiceOrders, VendorsReviews, CustomersReviews, Notifications, Orders } = require('../../models/index');
 
 
 module.exports = {
@@ -226,7 +226,8 @@ function updateOrders(data) {
 // Services CRUD
 function getServices() {
     return new Promise((resolve, reject) => {
-        Service.findAll()
+        const include = [ { model: SubService } ]
+        Service.findAll({ include })
             .then(services => resolve(services))
             .catch(err => reject(err));
     });
@@ -244,8 +245,9 @@ function updateService(data) {
 
 function addService(data) {
     return new Promise((resolve, reject) => {
-        Service.add(data)
+        Service.create(data, { include: [ SubService ]})
             .then(services => resolve(services))
             .catch(err => reject(err));
     });
 }
+

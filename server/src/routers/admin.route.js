@@ -5,7 +5,6 @@ const { authAdmin } = require("../../config/auth");
 const router = express.Router();
 
 router.post('/login', adminCrtl.login);
-router.get('/orders', authAdmin, adminCrtl.getOrders);
 
 router.get('/customer', adminCrtl.getCustomers);
 router.put('/customer', adminCrtl.updateCustomers);
@@ -19,6 +18,5 @@ router.put('/order', adminCrtl.updateOrders);
 router.get('/service', adminCrtl.getServices);
 router.put('/service', adminCrtl.updateService);
 router.post('/service', adminCrtl.addService);
-
 
 module.exports = router
