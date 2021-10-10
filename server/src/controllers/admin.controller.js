@@ -1,7 +1,8 @@
 const validator = require("email-validator");
+const _ = require("lodash");
 
 const resp = require("../../config/api.response");
-const { generateToken, isValidPassword } = require('../../utils/shared');
+const { generateToken, isValidPassword, encryptPassword } = require('../../utils/shared');
 const userService = require('../services/user.services');
 const view = require('../../utils/views');
 
@@ -29,7 +30,7 @@ async function login(req, res) {
         if (_.isEmpty(password))
             return resp.error(res, 'Provide required fields');
 
-        let user = await view.find({ table_name: 'ADMIN', key: 'email', value: email });
+        let user = await view.find('ADMIN', 'email', email);
         if (_.isEmpty(user))
             return resp.error(res, 'Invalid user');
 
