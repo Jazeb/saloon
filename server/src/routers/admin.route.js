@@ -6,17 +6,17 @@ const router = express.Router();
 
 router.post('/login', adminCrtl.login);
 
-router.get('/customer', adminCrtl.getCustomers);
-router.put('/customer', adminCrtl.updateCustomers);
+router.get('/customer', authAdmin, adminCrtl.getCustomers);
+router.put('/customer', authAdmin, adminCrtl.updateCustomers);
 
-router.get('/vendor', adminCrtl.getVendors);
-router.put('/vendor', adminCrtl.updateVendors);
+router.get('/vendor', authAdmin, adminCrtl.getVendors);
+router.put('/vendor', authAdmin, adminCrtl.updateVendors);
 
-router.get('/order', adminCrtl.getOrders);
-router.put('/order', adminCrtl.updateOrders);
+router.get('/order', authAdmin, adminCrtl.getOrders);
+router.put('/order', authAdmin, adminCrtl.updateOrders);
 
-router.get('/service', adminCrtl.getServices);
-router.put('/service', adminCrtl.updateService);
-router.post('/service', adminCrtl.addService);
+router.get('/service', authAdmin, adminCrtl.getServices);
+router.put('/service', authAdmin, adminCrtl.updateService);
+router.post('/service', authAdmin, adminCrtl.addService);
 
 module.exports = router
