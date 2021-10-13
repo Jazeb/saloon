@@ -12,7 +12,7 @@ router.use('/profileImage', express.static(process.cwd() + '/server/assets/profi
 router.post('/vendor/signup', userCrtl.userSignup);
 router.get('/vendor/:service_id', userCrtl.getVendersByServiceId);
 router.post('/vendor/login', userCrtl.login);
-router.put('/update', authVendor, userCrtl.updateUser);
+router.put('/vendor/update', authVendor, userCrtl.updateUser);
 router.post('/vendor/order/accept', authVendor, userCrtl.acceptServiceOrder);
 router.post('/vendor/order/start', authVendor, userCrtl.startService);
 router.post('/vendor/order/end', authVendor, userCrtl.endService);
@@ -23,6 +23,7 @@ router.post('/vendor/forgotPassword', userCrtl.forgotPassword);
 
 
 // customer APIs
+router.put('/customer/update', authCustomer, userCrtl.updateUser);
 router.post('/customer/signup', userCrtl.userSignup);
 router.post('/customer/login', userCrtl.login);
 router.post('/customer/service/place', authCustomer, userCrtl.placeService);

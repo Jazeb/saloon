@@ -32,7 +32,7 @@ module.exports = {
 
 function vendorSignup(user) {
     return new Promise((resolve, reject) => {
-        Vendors.create(user)
+        Vendors.create(user, { include:[Service]})
             .then(new_user => resolve(new_user))
             .catch(err => reject(err));
     });

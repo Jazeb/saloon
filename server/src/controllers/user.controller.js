@@ -171,9 +171,8 @@ async function userSignup(req, res) {
             user.image_url = fileName;
         }
 
-        // user.service_id = service_id;
+        user.service_id = service_id;
         user.password = encryptPassword(user.password);
-        delete user.service_id
 
         let new_user = model == 'VENDOR' ? await userService.vendorSignup(user) : await userService.customerSignup(user);
         new_user = new_user.toJSON();
@@ -234,10 +233,12 @@ async function updateUser(req, res) {
             req.body.image_url = fileName;
         }
         if (should_return) return
-        console.log(req.body)
-        let user = await userService.updateUser(req.body);
-        user && resp.success(res, user);
-        return
+
+        let new_user = req.user.user_type == 'VENDOR' ? await userService.updateVendors(params) : await userService.updateCustomers(params);
+
+        // let user = await userService.updateUser(req.body);
+        return resp.success(res, new_user);
+        
     } catch (err) {
         console.error(err);
         return resp.error(res, 'Error updating user', err)
