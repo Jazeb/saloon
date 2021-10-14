@@ -236,7 +236,6 @@ async function updateUser(req, res) {
 
         let new_user = req.user.user_type == 'VENDOR' ? await userService.updateVendors(params) : await userService.updateCustomers(params);
 
-        // let user = await userService.updateUser(req.body);
         return resp.success(res, new_user);
         
     } catch (err) {
@@ -309,7 +308,7 @@ async function changePassword(req, res) {
         if (_.isEmpty(old_password) || _.isEmpty(new_password) || _.isEmpty(confirm_password))
             return resp.error(res, 'Provide required fields');
 
-        const table_name = req.url == '/vendor/changePassword' ? 'vendors' : 'customers';
+        const table_name = req.url == '/vendor/changePassword' ? 'VENDOR' : 'CUSTOMER';
         const curr_user = await getUser('id', req.user.id, table_name);
         if (!curr_user)
             return resp.error(res, 'Invalid id');
@@ -321,7 +320,7 @@ async function changePassword(req, res) {
         if (new_password !== confirm_password)
             return resp.error(res, 'Password must match');
 
-        userService.resetPassword(curr_user.email, new_password).then(_ => resp.success(res, 'Password updated successfully'))
+        userService.resetPassword(req.user.id, new_password, table_name).then(_ => resp.success(res, 'Password updated successfully'))
             .catch(err => {
                 console.error(err);
                 return resp.error(res, 'Error updating password', err);

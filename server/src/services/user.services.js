@@ -16,7 +16,6 @@ module.exports = {
     updateOrders,
     vendorSignup,
     customerSignup,
-    updateUser,
     validateUser,
     resetPassword,
     updateFirebaseKey,
@@ -32,7 +31,7 @@ module.exports = {
 
 function vendorSignup(user) {
     return new Promise((resolve, reject) => {
-        Vendors.create(user, { include:[Service]})
+        Vendors.create(user, { include: [Service] })
             .then(new_user => resolve(new_user))
             .catch(err => reject(err));
     });
@@ -58,28 +57,15 @@ function validateUser(email) {
     });
 }
 
-function resetPassword(email, password) {
+function resetPassword(id, password, table_name) {
     password = encryptPassword(password);
+    let Model = table_name == 'VENDOR' ? Vendors : Customers;
     return new Promise((resolve, reject) => {
-        User.update({ password }, { where: { email } }).then(() => resolve(true)).catch(err => reject(err));
+        Model.update({ password }, { where: { id } }).then(_ => resolve(true)).catch(err => reject(err));
     });
 }
 
-const getUser = id => User.findOne({ where: { id }, attributes: { exclude: ['password', 'created_at', 'updated_at'] } });
-
-function updateUser(data) {
-    user_id = data.id
-    delete data.password
-    delete data.updated_at
-    delete data.created_at
-    delete data.id
-
-    return new Promise((resolve, reject) => {
-        User.update(data, { where: { id: user_id } })
-            .then(() => resolve(getUser(user_id)))
-            .catch(err => reject(err));
-    });
-}
+// const getUser = id => User.findOne({ where: { id }, attributes: { exclude: ['password', 'created_at', 'updated_at'] } });
 
 function updateFirebaseKey(firebase_key, user_id) {
     return new Promise((resolve, reject) => {
@@ -148,7 +134,7 @@ function addCustomerReview(data) {
 function addVendorNotification(data) {
     return new Promise((resolve, reject) => {
         const message = 'You order has been completed';
-        Notifications.create({ message, user_type:'VENDOR' })
+        Notifications.create({ message, user_type: 'VENDOR' })
             .then(_ => resolve(true))
             .catch(err => reject(err));
     });
@@ -157,7 +143,7 @@ function addVendorNotification(data) {
 function addCustomerNotification(data) {
     return new Promise((resolve, reject) => {
         const message = 'You job has been completed';
-        Notifications.create({ message, user_type:'CUSTOMER' })
+        Notifications.create({ message, user_type: 'CUSTOMER' })
             .then(_ => resolve(true))
             .catch(err => reject(err));
     });
@@ -178,8 +164,8 @@ function updateCustomers(data) {
     return new Promise((resolve, reject) => {
         let id = data.id;
         delete data.id;
-        Customers.update(data, { where:{ id }})
-            .then(customers => resolve(customers))
+        Customers.update(data, { where: { id } })
+            .then(_ => Customers.findOne({ where: { id }, attributes: { exclude: ['password', 'created_at', 'updated_at'] }}).then(customer => resolve(customer)))
             .catch(err => reject(err));
     });
 }
@@ -197,8 +183,8 @@ function updateVendors(data) {
     return new Promise((resolve, reject) => {
         let id = data.id;
         delete data.id;
-        Vendors.update(data, { where:{ id }})
-            .then(vendors => resolve(vendors))
+        Vendors.update(data, { where: { id }, attributes: { exclude: ['password', 'created_at', 'updated_at'] } })
+            .then(_ => Vendors.findOne({ where: { id } }).then(vendor => resolve(vendor)))
             .catch(err => reject(err));
     });
 }
@@ -216,7 +202,7 @@ function updateOrders(data) {
     return new Promise((resolve, reject) => {
         let id = data.id;
         delete data.id;
-        Orders.update(data, { where:{ id }})
+        Orders.update(data, { where: { id } })
             .then(orders => resolve(orders))
             .catch(err => reject(err));
     });
@@ -226,7 +212,7 @@ function updateOrders(data) {
 // Services CRUD
 function getServices() {
     return new Promise((resolve, reject) => {
-        const include = [ { model: SubService } ]
+        const include = [{ model: SubService }]
         Service.findAll({ include })
             .then(services => resolve(services))
             .catch(err => reject(err));
@@ -237,7 +223,7 @@ function updateService(data) {
     return new Promise((resolve, reject) => {
         let id = data.id;
         delete data.id;
-        Service.update(data, { where:{ id }})
+        Service.update(data, { where: { id } })
             .then(services => resolve(services))
             .catch(err => reject(err));
     });
@@ -245,7 +231,7 @@ function updateService(data) {
 
 function addService(data) {
     return new Promise((resolve, reject) => {
-        Service.create(data, { include: [ SubService ]})
+        Service.create(data, { include: [SubService] })
             .then(services => resolve(services))
             .catch(err => reject(err));
     });
