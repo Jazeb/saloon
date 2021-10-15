@@ -6,15 +6,9 @@ const router = express.Router();
 
 router.post('/login', adminCrtl.login);
 
-<<<<<<< Updated upstream
 router.get('/customer', authAdmin, adminCrtl.getCustomers);
 router.put('/customer', authAdmin, adminCrtl.updateCustomers);
-=======
-router.get('/users', adminCrtl.getUsers);
-
-router.get('/customer', adminCrtl.getCustomers);
-router.put('/customer', adminCrtl.updateCustomers);
->>>>>>> Stashed changes
+router.get('/users', authAdmin, adminCrtl.getUsers);
 
 router.get('/vendor', authAdmin, adminCrtl.getVendors);
 router.put('/vendor', authAdmin, adminCrtl.updateVendors);
