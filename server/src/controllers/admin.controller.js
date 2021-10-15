@@ -12,6 +12,7 @@ module.exports = {
     getOrders,
     getCustomers,
     getServices,
+    getUsers,
     addService,
     updateService,
     updateCustomers,
@@ -52,6 +53,16 @@ async function login(req, res) {
     } catch (err) {
         console.error(err)
         return resp.error(res, 'Something went wrong', err);
+    }
+}
+
+async function getUsers(req, res) {
+    try {
+        const users = await userService.getUsers();
+        return resp.success(res, users);
+    } catch (error) {
+        console.error(error);
+        return resp.error(res, error);
     }
 }
 

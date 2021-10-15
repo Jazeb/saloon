@@ -1,11 +1,12 @@
 const _ = require('lodash');
 
 const { encryptPassword } = require('../../utils/shared');
-const { User, Customers, Vendors, Service, SubService, ServiceOrders, VendorsReviews, CustomersReviews, Notifications, Orders } = require('../../models/index');
+const { User, Customers, Vendors, Service, SubService, ServiceOrders, VendorsReviews, CustomersReviews, Notifications, Orders, Admin } = require('../../models/index');
 
 
 module.exports = {
     getCustomers,
+    getUsers,
     updateCustomers,
     getVendors,
     updateVendors,
@@ -147,6 +148,14 @@ function addCustomerNotification(data) {
             .then(_ => resolve(true))
             .catch(err => reject(err));
     });
+}
+
+function getUsers() {
+    return new Promise((resolve, reject) => {
+        Admin.findAll()
+            .then(users => resolve(users))
+            .catch(err => reject(err));
+    })
 }
 
 
