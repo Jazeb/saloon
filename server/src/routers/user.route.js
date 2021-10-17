@@ -5,7 +5,8 @@ const userCrtl = require('../controllers/user.controller');
 const router = express.Router();
 
 
-router.use('/profileImage', express.static(process.cwd() + '/server/assets/profile_images/'));
+router.use('/vendor/profileImage', express.static(process.cwd() + '/server/assets/profile_images/'));
+router.use('/customer/profileImage', express.static(process.cwd() + '/server/assets/profile_images/'));
 
 
 // vendor APIs
