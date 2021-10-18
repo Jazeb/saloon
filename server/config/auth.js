@@ -8,7 +8,7 @@ const authAdmin = async (req, res, next) => {
         if (auth_token == null) return res.sendStatus(401);
     
         const token = await verifyToken(auth_token);
-        if (!token || !token.is_admin) return res.sendStatus(401);
+        if (!token) return res.sendStatus(401);
     
         // const user = await validateUser(token);
         // if (!user) return res.sendStatus(401);
