@@ -221,7 +221,7 @@ function updateOrders(data) {
 // Services CRUD
 function getServices() {
     return new Promise((resolve, reject) => {
-        const include = [{ model: SubService }]
+        const include =  ["parentServices", "subservices"] 
         Service.findAll({ include })
             .then(services => resolve(services))
             .catch(err => reject(err));

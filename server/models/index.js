@@ -50,4 +50,13 @@ Vendors.belongsTo(Service, {
     targetKey:'id'
 });
 
+Service.hasMany(Service, {
+    as: 'subservices', 
+    foreignKey: 'parent_id'
+});
+
+Service.belongsTo(Service, {
+    as: 'parentServices', 
+    foreignKey: 'parent_id'});
+
 module.exports = { db, Admin, Customers, Vendors, Service, SubService, ServiceOrders, CustomersReviews, VendorsReviews, Notifications };

@@ -156,6 +156,7 @@ async function addService(req, res) {
     try {
         const data = req.body;
         const added = await userService.addService(data);
+        console.log(added);
         return resp.success(res, added);
     } catch (error) {
         console.error(error);
