@@ -155,6 +155,16 @@ async function updateService(req, res) {
 async function addService(req, res) {
     try {
         const data = req.body;
+
+        if (req.files && req.files.service_image) {
+            const image = req.files.service_image;
+            let fileName = image.name.replace(' ', '_').split('.').reverse()[0];
+            fileName = '/image_' + Date.now() + '.' + fileName;
+
+            let dest_url = process.cwd() + '/server/assets/service_images' + fileName;
+            image.mv(dest_url);
+            data.image_url = fileName;
+        }
         const added = await userService.addService(data);
         console.log(added);
         return resp.success(res, added);
