@@ -1,4 +1,4 @@
-const express = require('express')
+const express = require('express');
 const adminCrtl = require('../controllers/admin.controller');
 const { authAdmin } = require("../../config/auth");
 

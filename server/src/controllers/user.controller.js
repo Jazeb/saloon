@@ -111,11 +111,11 @@ async function endService(req, res) {
 async function placeService(req, res) {
     try {
         const pubsub = require('../../graphql/pubsub');
-        const { lat, long, service_id, sub_service_id } = req.body;
-        if (!lat || !long || !service_id || !sub_service_id)
+        const { lat, long, service_id } = req.body;
+        if (!lat || !long || !service_id)
             return resp.error(res, 'Provide required fields');
 
-        const order_data = { lat, long, service_id, sub_service_id };
+        const order_data = { lat, long, service_id };
 
         order_data['customer_id'] = req.user.id;
 
@@ -123,7 +123,7 @@ async function placeService(req, res) {
 
 
         pubsub.publish('NEW_JOB_ALERT', {
-            NEW_JOB_ALERT: { service_id, sub_service_id, lat, long, order_id: service_data.id }
+            NEW_JOB_ALERT: { service_id, lat, long, order_id: service_data.id }
         });
         return resp.success(res, order_data, 'Service posted');
 
@@ -153,6 +153,7 @@ async function userSignup(req, res) {
         return resp.error(res, 'Provide required fields');
 
     if (!validator.validate(email)) return resp.error(res, 'Provide a valid email');
+
     try {
 
         const model = req.url == '/vendor/signup' ? 'VENDOR' : 'CUSTOMER';

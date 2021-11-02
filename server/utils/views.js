@@ -32,8 +32,8 @@ const findAll = model => {
         let Model = null;
         if(model == 'SERVICES') Model = Service;
         
-        const include = [ { model: SubService}]
-        Model.findAll({ include }).then(services => resolve(services))
+        // const include = [ { model: SubService}]
+        Model.findAll().then(services => resolve(services))
         .catch(err => reject(err));
     });
 }

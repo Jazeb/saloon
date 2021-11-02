@@ -1,7 +1,19 @@
 const _ = require('lodash');
 
 const { encryptPassword } = require('../../utils/shared');
-const { User, Customers, Vendors, Service, SubService, ServiceOrders, VendorsReviews, CustomersReviews, Notifications, Orders, Admin } = require('../../models/index');
+const { 
+    User, 
+    Customers, 
+    Vendors, 
+    Service, 
+    SubService, 
+    ServiceOrders, 
+    VendorsReviews, 
+    CustomersReviews, 
+    Notifications, 
+    Orders, 
+    Admin 
+} = require('../../models/index');
 
 
 module.exports = {
@@ -132,7 +144,7 @@ function addCustomerReview(data) {
     });
 }
 
-function addVendorNotification(data) {
+function addVendorNotification() {
     return new Promise((resolve, reject) => {
         const message = 'You order has been completed';
         Notifications.create({ message, user_type: 'VENDOR' })
@@ -141,7 +153,7 @@ function addVendorNotification(data) {
     });
 }
 
-function addCustomerNotification(data) {
+function addCustomerNotification() {
     return new Promise((resolve, reject) => {
         const message = 'You job has been completed';
         Notifications.create({ message, user_type: 'CUSTOMER' })

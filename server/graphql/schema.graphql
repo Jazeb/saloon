@@ -7,11 +7,12 @@ type Job {
 	lat: String!
 	long: String!
 	service_id: Int!
-	sub_service_id: Int
+	parent_id: Int
+	# sub_service_id: Int
 	# service_name: String!
 }
 
-
+# this query is not used
 type Query {
 	GET_PRODUCT(product_id: Int!): [Job]
 }

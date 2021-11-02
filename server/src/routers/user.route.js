@@ -10,14 +10,14 @@ router.use('/customer/profileImage', express.static(process.cwd() + '/server/ass
 
 
 // vendor APIs
-router.post('/vendor/signup', userCrtl.userSignup);
-router.get('/vendor/:service_id', userCrtl.getVendersByServiceId);
 router.post('/vendor/login', userCrtl.login);
+router.post('/vendor/signup', userCrtl.userSignup);
 router.put('/vendor/update', authVendor, userCrtl.updateUser);
-router.post('/vendor/order/accept', authVendor, userCrtl.acceptServiceOrder);
-router.post('/vendor/order/start', authVendor, userCrtl.startService);
-router.post('/vendor/order/end', authVendor, userCrtl.endService);
 router.post('/vendor/review', authVendor, userCrtl.submitReview);
+router.get('/vendor/:service_id', userCrtl.getVendersByServiceId);
+router.post('/vendor/order/end', authVendor, userCrtl.endService);
+router.post('/vendor/order/start', authVendor, userCrtl.startService);
+router.post('/vendor/order/accept', authVendor, userCrtl.acceptServiceOrder);
 
 router.post('/vendor/changePassword', authVendor, userCrtl.changePassword);
 router.post('/vendor/forgotPassword', userCrtl.forgotPassword);
