@@ -26,6 +26,14 @@ module.exports = function (sequelize, DataTypes) {
         image_url: {
             type: DataTypes.STRING(255),
             allowNull: true
+        },
+        lat: {
+            type: DataTypes.INTEGER(11),
+            allowNull: true
+        },
+        long: {
+            type: DataTypes.INTEGER(11),
+            allowNull: true
         }
     }, {
         sequelize,
