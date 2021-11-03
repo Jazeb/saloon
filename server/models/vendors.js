@@ -22,7 +22,10 @@ module.exports = function (sequelize, DataTypes) {
             type: DataTypes.STRING(255),
             allowNull: true
         },
-        
+        phone_no: {
+            type: DataTypes.STRING(20),
+            allowNull: false
+        },
         image_url: {
             type: DataTypes.STRING(255),
             allowNull: true

@@ -150,8 +150,8 @@ async function getVendersByServiceId(req, res) {
 }
 
 async function userSignup(req, res) {
-    const { first_name, last_name, email, password, service_id } = req.body;
-    if (_.isEmpty(first_name) || _.isEmpty(last_name) || _.isEmpty(email) || _.isEmpty(password))
+    const { first_name, last_name, email, password, service_id, phone_no } = req.body;
+    if (_.isEmpty(first_name) || _.isEmpty(last_name) || !phone_no || _.isEmpty(email) || _.isEmpty(password))
         return resp.error(res, 'Provide required fields');
 
     if (!validator.validate(email)) return resp.error(res, 'Provide a valid email');
@@ -165,7 +165,7 @@ async function userSignup(req, res) {
 
         const user = req.body;
         if (req.files && req.files.profile_image) {
-            const image = req.files.profile_image;
+            let image = req.files.profile_image;
             let fileName = image.name.replace(' ', '_').split('.').reverse()[0];
             fileName = '/image_' + Date.now() + '.' + fileName;
 
@@ -180,6 +180,7 @@ async function userSignup(req, res) {
         let new_user = model == 'VENDOR' ? await userService.vendorSignup(user) : await userService.customerSignup(user);
         new_user = new_user.toJSON();
         new_user.user_type = model;
+        
         delete new_user.password;
         delete new_user.created_at;
         delete new_user.updated_at;
