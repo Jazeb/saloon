@@ -21,6 +21,7 @@ router.post('/vendor/order/accept', authVendor, userCrtl.acceptServiceOrder);
 
 router.post('/vendor/changePassword', authVendor, userCrtl.changePassword);
 router.post('/vendor/forgotPassword', userCrtl.forgotPassword);
+router.post('/vendor/updateLocation',authVendor, userCrtl.updateLocation);
 
 
 // customer APIs

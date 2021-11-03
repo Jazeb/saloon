@@ -39,7 +39,8 @@ module.exports = {
     addVendorReview,
     addCustomerReview,
     addCustomerNotification,
-    addVendorNotification
+    addVendorNotification,
+    updateLocation
 }
 
 function vendorSignup(user) {
@@ -258,3 +259,10 @@ function addService(data) {
     });
 }
 
+function updateLocation(data) {
+    return new Promise((resolve, reject) => {
+        Vendors.update({ lat:data.lat, long:data.long }, { where:{ id: data.user_id }})
+            .then(_ => resolve(true))
+            .catch(err => reject(err));
+    });
+}

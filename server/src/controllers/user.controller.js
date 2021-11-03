@@ -20,7 +20,8 @@ module.exports = {
     startService,
     endService,
     acceptServiceOrder,
-    submitReview
+    submitReview,
+    updateLocation
 }
 
 async function acceptServiceOrder(req, res) {
@@ -396,3 +397,17 @@ function submitReview(req, res) {
 }
 
 const stringToBoolean = string => string === 'false' ? false : !!string;
+
+function updateLocation(req, res) {
+    const { lat, long } = req.body;
+    if(!lat || !long) return resp.error(res, 'Provide lat and long');
+
+    const user = req.user;
+    const data = {
+        lat, long,
+        user_id: user.id,
+    }
+    userService.updateLocation(data)
+        .then(_ => resp.success(res, 'Location updated'))
+        .catch(err => resp.error(res, 'Error updating location', err));
+}
