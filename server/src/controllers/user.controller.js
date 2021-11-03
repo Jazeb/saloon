@@ -180,7 +180,7 @@ async function userSignup(req, res) {
         let new_user = model == 'VENDOR' ? await userService.vendorSignup(user) : await userService.customerSignup(user);
         new_user = new_user.toJSON();
         new_user.user_type = model;
-        
+
         delete new_user.password;
         delete new_user.created_at;
         delete new_user.updated_at;
@@ -410,8 +410,17 @@ function updateLocation(req, res) {
         user_id: user.id,
     }
     userService.updateLocation(data)
+        .then(sendsubscriptionEvent(data))
         .then(_ => resp.success(res, 'Location updated'))
         .catch(err => resp.error(res, 'Error updating location', err));
+}
+
+function sendsubscriptionEvent(data) {
+    const pubsub = require('../../graphql/pubsub');
+    
+    pubsub.publish('LOCATION_UPDATE', {
+        LOCATION_UPDATE: data
+    });
 }
 
 function getCustomerBookings(req, res) {

@@ -3,6 +3,10 @@ type Subscription {
 	NEW_JOB_ALERT: Job
 }
 
+type Subscription {
+	LOCATION_UPDATE: Location
+}
+
 type Job {
 	lat: String!
 	long: String!
@@ -10,6 +14,12 @@ type Job {
 	parent_id: Int
 	# sub_service_id: Int
 	# service_name: String!
+}
+
+type Location {
+	lat: String!
+	long: String!
+	user_id: Int!
 }
 
 # this query is not used
