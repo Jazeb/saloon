@@ -23,6 +23,4 @@ module.exports = function (sequelize, DataTypes) {
         tableName: 'services',
         timestamps: true
     });
-    
-    
 }

@@ -31,6 +31,9 @@ router.post('/customer/login', userCrtl.login);
 router.post('/customer/service/place', authCustomer, userCrtl.placeService);
 router.post('/customer/review', authCustomer, userCrtl.submitReview);
 
+router.post('/customer/order/end', authCustomer, userCrtl.endService);
+router.get('/customer/bookings', authCustomer, userCrtl.getCustomerBookings);
+
 
 router.post('/customer/changePassword', authCustomer, userCrtl.changePassword);
 router.post('/customer/forgotPassword', userCrtl.forgotPassword);

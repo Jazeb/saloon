@@ -10,8 +10,7 @@ const {
     ServiceOrders, 
     VendorsReviews, 
     CustomersReviews, 
-    Notifications, 
-    Orders, 
+    Notifications,
     Admin 
 } = require('../../models/index');
 
@@ -40,7 +39,8 @@ module.exports = {
     addCustomerReview,
     addCustomerNotification,
     addVendorNotification,
-    updateLocation
+    updateLocation,
+    getOrdersByCustomer
 }
 
 function vendorSignup(user) {
@@ -118,16 +118,16 @@ function saveService(body) {
     });
 }
 
-function updateService(data) {
-    return new Promise((resolve, reject) => {
-        const id = data.id;
-        delete data.id;
-
-        ServiceOrders.update(data, { where: { id } })
-            .then(_ => resolve(true))
-            .catch(err => reject(err));
-    });
-}
+// function updateOrders(data) {
+//     console.log({data})
+//     return new Promise((resolve, reject) => {
+//         const id = data.id;
+//         delete data.id;
+//         ServiceOrders.update(data, { where: { id } })
+//             .then(_ => resolve(true))
+//             .catch(err => reject(err));
+//     });
+// }
 
 function addVendorReview(data) {
     return new Promise((resolve, reject) => {
@@ -214,7 +214,7 @@ function updateVendors(data) {
 // ORDERS CRUD
 function getOrders() {
     return new Promise((resolve, reject) => {
-        Orders.findAll()
+        ServiceOrders.findAll()
             .then(orders => resolve(orders))
             .catch(err => reject(err));
     });
@@ -224,7 +224,7 @@ function updateOrders(data) {
     return new Promise((resolve, reject) => {
         let id = data.id;
         delete data.id;
-        Orders.update(data, { where: { id } })
+        ServiceOrders.update(data, { where: { id } })
             .then(orders => resolve(orders))
             .catch(err => reject(err));
     });
@@ -253,7 +253,7 @@ function updateService(data) {
 
 function addService(data) {
     return new Promise((resolve, reject) => {
-        Service.create(data, { include: [SubService] })
+        Service.create(data, { include: [ SubService ] })
             .then(services => resolve(services))
             .catch(err => reject(err));
     });
@@ -264,5 +264,15 @@ function updateLocation(data) {
         Vendors.update({ lat:data.lat, long:data.long }, { where:{ id: data.user_id }})
             .then(_ => resolve(true))
             .catch(err => reject(err));
+    });
+}
+
+function getOrdersByCustomer(user_id) {
+    return new Promise((resolve, reject) => {
+        const include = [{ model: Service }, { model:Vendors }];
+
+        ServiceOrders.findAll({ where:{ status: 'COMPLETED', customer_id: user_id }, include })
+                .then(bookings => resolve(bookings))
+                .catch(err => reject(err));
     });
 }

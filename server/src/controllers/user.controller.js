@@ -21,7 +21,8 @@ module.exports = {
     endService,
     acceptServiceOrder,
     submitReview,
-    updateLocation
+    updateLocation,
+    getCustomerBookings
 }
 
 async function acceptServiceOrder(req, res) {
@@ -43,8 +44,8 @@ async function acceptServiceOrder(req, res) {
                 accepted_by: req.user.id,
                 vendor_id: req.user.id
             }
-            userService.updateService(data)
-                .then(_ => resp.success(res, 'Order is accepted'))
+            userService.updateOrders(data)
+                .then(s => resp.success(res, 'Order is accepted'))
                 .catch(err => resp.error(res, 'Something went wrong', err));
         }
 
@@ -410,4 +411,11 @@ function updateLocation(req, res) {
     userService.updateLocation(data)
         .then(_ => resp.success(res, 'Location updated'))
         .catch(err => resp.error(res, 'Error updating location', err));
+}
+
+function getCustomerBookings(req, res) {
+    const user_id = req.user.id;
+    userService.getOrdersByCustomer(user_id)
+        .then(bookings => resp.success(res, bookings))
+        .catch(err => resp.error(res, 'Error getting bookings', err));
 }

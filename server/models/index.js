@@ -18,6 +18,21 @@ Admin = require('./admin')(sequelize, Sequelize);
 //     targetKey:'id'
 // });
 
+ServiceOrders.belongsTo(Service, {
+    foreignKey: 'service_id',
+    targetKey:'id'
+});
+
+ServiceOrders.belongsTo(Customers, {
+    foreignKey: 'service_id',
+    targetKey:'id'
+});
+
+ServiceOrders.belongsTo(Vendors, {
+    foreignKey: 'service_id',
+    targetKey:'id'
+});
+
 // Customers relationships
 Customers.hasMany(CustomersReviews, {
     foreignKey: 'customer_id',
@@ -57,6 +72,7 @@ Service.hasMany(Service, {
 
 Service.belongsTo(Service, {
     as: 'parentServices', 
-    foreignKey: 'parent_id'});
+    foreignKey: 'parent_id'
+});
 
 module.exports = { db, Admin, Customers, Vendors, Service, ServiceOrders, CustomersReviews, VendorsReviews, Notifications };
