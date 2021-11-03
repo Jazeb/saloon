@@ -7,6 +7,16 @@ type Subscription {
 	LOCATION_UPDATE: Location
 }
 
+
+type Subscription {
+	ORDER_CANCEL: OrderCancel
+}
+
+type OrderCancel {
+	order_id: Int!,
+	vendor_id: Int!,
+}
+
 type Job {
 	lat: String!
 	long: String!

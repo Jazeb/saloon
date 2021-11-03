@@ -32,6 +32,7 @@ router.post('/customer/service/place', authCustomer, userCrtl.placeService);
 router.post('/customer/review', authCustomer, userCrtl.submitReview);
 
 router.post('/customer/order/end', authCustomer, userCrtl.endService);
+router.post('/customer/order/cancel', authCustomer, userCrtl.cancelService);
 router.get('/customer/bookings', authCustomer, userCrtl.getCustomerBookings);
 
 

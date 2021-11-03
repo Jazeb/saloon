@@ -22,7 +22,8 @@ module.exports = {
     acceptServiceOrder,
     submitReview,
     updateLocation,
-    getCustomerBookings
+    getCustomerBookings,
+    cancelService
 }
 
 async function acceptServiceOrder(req, res) {
@@ -108,6 +109,35 @@ async function endService(req, res) {
         console.error(error);
         return resp.error(res, 'Something went wrong', error);
     }
+}
+
+async function cancelService(req, res) {
+    const { order_id, reason } = req.body;
+    if(!order_id || !reason) return resp.error(res, 'Provide required fields');
+
+    try {
+        const curr_order = await view.find('ORDER', 'id', order_id);
+        if(_.isEmpty(curr_order) || ['COMPLETED', 'CANCELLED'].includes(curr_order.status))
+            return resp.error(res, 'Cannot cancel already completed order');
+    
+        req.body.vendor_id = curr_order.vendor_id;
+        userService.cancelServiceOrder(req.body)
+            .then(orderCancelSub(req.body))
+            .then(_ => resp.success(res, 'Order cancelled'))
+            .catch(err => resp.error(res, 'Error updating service order', err));
+        
+    } catch (err) {
+        console.error(err);
+        return resp.error(res, 'Error updating service order', err)
+    }
+}
+
+function orderCancelSub(data) {
+    const pubsub = require('../../graphql/pubsub');
+
+    pubsub.publish('ORDER_CANCEL', {
+        ORDER_CANCEL: { order_id: data.order_id, vendor_id: data.vendor_id }
+    });
 }
 
 async function placeService(req, res) {
@@ -417,7 +447,7 @@ function updateLocation(req, res) {
 
 function sendsubscriptionEvent(data) {
     const pubsub = require('../../graphql/pubsub');
-    
+
     pubsub.publish('LOCATION_UPDATE', {
         LOCATION_UPDATE: data
     });
