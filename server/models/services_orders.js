@@ -10,10 +10,10 @@ module.exports = function (sequelize, DataTypes) {
             type: DataTypes.INTEGER(11),
             allowNull: false
         },
-        // sub_service_id: {
-        //     type: DataTypes.INTEGER(11),
-        //     allowNull: false
-        // },
+        sub_service_id: {
+            type: DataTypes.INTEGER(11),
+            allowNull: true
+        },
         lat: {
             type: DataTypes.STRING(11),
             allowNull: false

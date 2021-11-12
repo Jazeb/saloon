@@ -38,12 +38,13 @@ async function acceptServiceOrder(req, res) {
         if (_.isEmpty(order) || order.state !== 'PENDING' || order.status !== 'PENDING')
             return resp.error(res, 'Invalid order id provided');
 
+        const user_id = req.user.id;
         if (status == 'ACCEPT') {
             const data = {
                 id: order_id,
                 state: 'ACCEPTED',
-                accepted_by: req.user.id,
-                vendor_id: req.user.id
+                accepted_by: user_id,
+                vendor_id: user_id
             }
             userService.updateOrders(data)
                 .then(s => resp.success(res, 'Order is accepted'))
@@ -143,11 +144,11 @@ function orderCancelSub(data) {
 async function placeService(req, res) {
     try {
         const pubsub = require('../../graphql/pubsub');
-        const { lat, long, service_id } = req.body;
-        if (!lat || !long || !service_id)
+        const { lat, long, service_id, sub_service_id } = req.body;
+        if (!lat || !long || !service_id || !sub_service_id)
             return resp.error(res, 'Provide required fields');
 
-        const order_data = { lat, long, service_id };
+        const order_data = { lat, long, service_id, sub_service_id };
 
         order_data['customer_id'] = req.user.id;
 
@@ -156,6 +157,7 @@ async function placeService(req, res) {
         const service = await view.find('SERVICE', 'id', service_id);
 
         const obj = {
+        sub_service_id,
             customer_name: req.user.first_name + ' ' + req.user.last_name,
             service_id, lat, long, order_id: service_data.id,
             service_name: service.service_name,

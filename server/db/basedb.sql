@@ -1,15 +1,15 @@
 INSERT INTO `services` 
-(`service_name`, `parent_id`) VALUES
-('Barber Services', null),
-('Shaving', null),
-('Hair Saloon Services', 1);
+(`service_name`) VALUES
+('Barber Services'),
+('Shaving'),
+('Hair Saloon Services');
 
 
--- INSERT INTO `sub_services`
--- (`sub_service_name`, `service_id`) VALUES 
--- ('Hair Cut', 1),
--- ('Shave, Beard', 2),
--- ('Hair Styling', 3);
+INSERT INTO `sub_services`
+(`sub_service_name`, `service_id`) VALUES 
+('Hair Cut', 1),
+('Shave, Beard', 2),
+('Hair Styling', 3);
 
 ALTER TABLE vendors ADD COLUMN phone_no VARCHAR(20) NOT NULL;
 

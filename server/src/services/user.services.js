@@ -100,7 +100,7 @@ function getUserService(service_id) {
 
 function getVenderByServiceId(service_id) {
     return new Promise((resolve, reject) => {
-        const include = [{ model: Service }]
+        const include = [{ model: Service, include:[{ model: SubService }] }];
         Vendors.findAll({ where: { service_id }, include }).then(users => resolve(users))
             .catch(err => reject(err));
     });

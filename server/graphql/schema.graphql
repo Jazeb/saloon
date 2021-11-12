@@ -21,7 +21,7 @@ type Job {
 	lat: String!
 	long: String!
 	service_id: Int!
-	parent_id: Int
+	sub_service_id: Int
 	service_name: String
 	customer_name: String
 	customer_image_url: String
