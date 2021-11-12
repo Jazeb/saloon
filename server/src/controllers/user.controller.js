@@ -153,10 +153,22 @@ async function placeService(req, res) {
 
         const service_data = await userService.saveService(order_data);
 
+        const service = await view.find('SERVICE', 'id', service_id);
+
+        const obj = {
+            customer_name: req.user.first_name + ' ' + req.user.last_name,
+            service_id, lat, long, order_id: service_data.id,
+            service_name: service.service_name,
+            customer_image_url: req.user.image_url,
+            customer_phone_no: req.user.phone_no,
+            service_image_url: service.image_url,
+            service_name: service.service_name
+        }
 
         pubsub.publish('NEW_JOB_ALERT', {
-            NEW_JOB_ALERT: { service_id, lat, long, order_id: service_data.id }
+            NEW_JOB_ALERT: obj
         });
+
         return resp.success(res, order_data, 'Service posted');
 
     } catch (error) {

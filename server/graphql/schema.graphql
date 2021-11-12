@@ -22,8 +22,11 @@ type Job {
 	long: String!
 	service_id: Int!
 	parent_id: Int
-	# sub_service_id: Int
-	# service_name: String!
+	service_name: String
+	customer_name: String
+	customer_image_url: String
+	customer_phone_no: String
+	service_image_url: String
 }
 
 type Location {

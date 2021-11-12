@@ -111,10 +111,7 @@ function getVenderByServiceId(service_id) {
 function saveService(body) {
     return new Promise((resolve, reject) => {
         ServiceOrders.create(body)
-            .then(data => {
-                console.log(data);
-                return resolve(data);
-            })
+            .then(data => resolve(data))
             .catch(err => reject(err));
     });
 }
