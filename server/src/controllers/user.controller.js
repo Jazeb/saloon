@@ -47,7 +47,7 @@ async function acceptServiceOrder(req, res) {
                 vendor_id: user_id
             }
             userService.updateOrders(data)
-                .then(s => resp.success(res, 'Order is accepted'))
+                .then(order => resp.success(res, order))
                 .catch(err => resp.error(res, 'Something went wrong', err));
         }
 

@@ -13,11 +13,12 @@ type Subscription {
 }
 
 type OrderCancel {
-	order_id: Int!,
-	vendor_id: Int!,
+	order_id: Int!
+	vendor_id: Int!
 }
 
 type Job {
+	order_id: Int
 	lat: String!
 	long: String!
 	service_id: Int!
