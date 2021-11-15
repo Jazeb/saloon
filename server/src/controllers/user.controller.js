@@ -293,6 +293,7 @@ async function updateUser(req, res) {
 }
 
 async function login(req, res) {
+    console.log(req.body)
     try {
         const { email, password } = req.body;
 
@@ -306,8 +307,6 @@ async function login(req, res) {
         let user = await view.find(model, 'email', email);
         if (_.isEmpty(user))
             return resp.error(res, 'Invalid user');
-
-        user = user.toJSON();
 
         let isValid = await isValidPassword(password, user.password);
         if (!isValid)
