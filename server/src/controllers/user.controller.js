@@ -40,15 +40,17 @@ async function acceptServiceOrder(req, res) {
 
         const user_id = req.user.id;
         if (status == 'ACCEPT') {
-            const data = {
+            let data = {
                 id: order_id,
                 state: 'ACCEPTED',
                 accepted_by: user_id,
                 vendor_id: user_id
             }
+            orderAcceptedSub(data);
             userService.updateOrders(data)
                 .then(order => resp.success(res, order))
                 .catch(err => resp.error(res, 'Something went wrong', err));
+            
         }
 
     } catch (error) {
@@ -134,10 +136,18 @@ async function cancelService(req, res) {
 }
 
 function orderCancelSub(data) {
-    const pubsub = require('../../graphql/pubsub');
+    let pubsub = require('../../graphql/pubsub');
 
     pubsub.publish('ORDER_CANCEL', {
         ORDER_CANCEL: { order_id: data.order_id, vendor_id: data.vendor_id }
+    });
+}
+
+function orderAcceptedSub(data) {
+    let pubsub = require('../../graphql/pubsub');
+
+    pubsub.publish('ORDER_ACCEPTED', {
+        ORDER_ACCEPTED: { order_id: data.order_id, vendor_id: data.vendor_id, accepted_by:data.accepted_by }
     });
 }
 
