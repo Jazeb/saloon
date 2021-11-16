@@ -44,7 +44,8 @@ async function acceptServiceOrder(req, res) {
                 id: order_id,
                 state: 'ACCEPTED',
                 accepted_by: user_id,
-                vendor_id: user_id
+                vendor_id: user_id,
+                customer_id: order.customer_id
             }
             orderAcceptedSub(data);
             userService.updateOrders(data)
@@ -147,7 +148,7 @@ function orderAcceptedSub(data) {
     let pubsub = require('../../graphql/pubsub');
 
     pubsub.publish('ORDER_ACCEPTED', {
-        ORDER_ACCEPTED: { order_id: data.order_id, vendor_id: data.vendor_id, accepted_by:data.accepted_by }
+        ORDER_ACCEPTED: { customer_id: data.customer_id, order_id: data.order_id, vendor_id: data.vendor_id, accepted_by:data.accepted_by }
     });
 }
 
