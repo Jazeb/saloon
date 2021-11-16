@@ -15,6 +15,7 @@ type OrderAccepted {
 	order_id: Int
 	vendor_id: Int
 	accepted_by: Int
+	customer_id: Int
 }
 
 type Job {
