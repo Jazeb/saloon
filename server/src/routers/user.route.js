@@ -11,6 +11,7 @@ router.use('/customer/profileImage', express.static(process.cwd() + '/server/ass
 
 // vendor APIs
 router.post('/vendor/login', userCrtl.login);
+router.post('/vendor/logout', authVendor, userCrtl.logout);
 router.post('/vendor/signup', userCrtl.userSignup);
 router.put('/vendor/update', authVendor, userCrtl.updateUser);
 router.post('/vendor/review', authVendor, userCrtl.submitReview);
@@ -25,6 +26,7 @@ router.post('/vendor/updateLocation',authVendor, userCrtl.updateLocation);
 
 
 // customer APIs
+router.post('/customer/logout', authCustomer, userCrtl.logout);
 router.put('/customer/update', authCustomer, userCrtl.updateUser);
 router.post('/customer/signup', userCrtl.userSignup);
 router.post('/customer/login', userCrtl.login);

@@ -10,6 +10,7 @@ const view = require('../../utils/views');
 
 module.exports = {
     login,
+    logout,
     get,
     userSignup,
     getVendersByServiceId,
@@ -24,6 +25,16 @@ module.exports = {
     updateLocation,
     getCustomerBookings,
     cancelService
+}
+
+
+function logout(req, res) {
+    let { id } = req.user;
+    let model = req.url == '/vendor/logout' ? 'VENDOR' : 'CUSTOMER';
+
+    userService.updateLogout(id, model)
+        .then(_ => resp.success(res, 'Logout success'))
+        .catch(err => resp.error(res, 'Something went wrong', err));
 }
 
 async function acceptServiceOrder(req, res) {
@@ -192,11 +203,14 @@ async function placeService(req, res) {
 
 async function getVendersByServiceId(req, res) {
     try {
-        const service_id = req.params.service_id;
-        if (!service_id)
-            return resp.error(res, 'Provide service id');
+        const { service_id } = req.params;
+        const { lat, lon } = req.query;
 
-        const users = await userService.getVenderByServiceId(service_id);
+        if (!service_id || !lat || !lon)
+            return resp.error(res, 'Provide required fields');
+
+        const data = { service_id, lat, lon };
+        const users = await userService.getVenderByServiceId(data);
         return resp.success(res, users);
     } catch (error) {
         console.log(error);
@@ -482,4 +496,9 @@ function getCustomerBookings(req, res) {
     userService.getOrdersByCustomer(user_id)
         .then(bookings => resp.success(res, bookings))
         .catch(err => resp.error(res, 'Error getting bookings', err));
+}
+
+// remove fcm and update is_login key from user obj
+function logOut(req, res) {
+
 }

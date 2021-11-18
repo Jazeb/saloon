@@ -1,21 +1,22 @@
 const _ = require('lodash');
 
 const { encryptPassword } = require('../../utils/shared');
-const { 
-    User, 
-    Customers, 
-    Vendors, 
-    Service, 
-    SubService, 
-    ServiceOrders, 
-    VendorsReviews, 
-    CustomersReviews, 
-    Notifications,
-    Admin 
+const {
+    Admin,
+    User,
+    Customers,
+    Vendors,
+    Service,
+    SubService,
+    ServiceOrders,
+    VendorsReviews,
+    CustomersReviews,
+    Notifications
 } = require('../../models/index');
 
 
 module.exports = {
+    updateLogout,
     getCustomers,
     getUsers,
     updateCustomers,
@@ -42,6 +43,22 @@ module.exports = {
     updateLocation,
     getOrdersByCustomer,
     cancelServiceOrder
+}
+
+function updateLogout(id, model) {
+    return new Promise((resolve, reject) => {
+
+        let Model = null;
+
+        if (model == 'VENDOR') Model = Vendors;
+        else Model = Customers;
+
+        if(!Model) return console.error('model not defined');
+        Model.update({ fcm_key: null, is_login: false }, { where: { id } })
+            .then(_ => resolve(true))
+            .catch(err => reject(err));
+
+    })
 }
 
 function vendorSignup(user) {
@@ -98,12 +115,37 @@ function getUserService(service_id) {
     });
 }
 
-function getVenderByServiceId(service_id) {
-    return new Promise((resolve, reject) => {
-        const include = [{ model: Service, include:[{ model: SubService }] }];
-        Vendors.findAll({ where: { service_id }, include }).then(users => resolve(users))
-            .catch(err => reject(err));
+function getVenderByServiceId(data) {
+
+    return new Promise(async (resolve, reject) => {
+        const vendors = [];
+
+        const include = [{ model: Service, include: [{ model: SubService }] }];
+        const users = await Vendors.findAll({ where: { service_id:data.service_id }, include });
+
+        for(let user of users) {
+            let dist = findDistance(user.lat, user.lon, data.lan, data.lon);
+            if(dist <= 60) vendors.push(user);
+            console.log({ dist });
+        }
+        return resolve(vendors);
     });
+}
+
+function findDistance(lat1, lon1, lat2, lon2, unit) {
+    console.log({lat1, lon1, lat2, lon2})
+    let radlat1 = Math.PI * lat1/180;
+    let radlat2 = Math.PI * lat2/180;
+    let theta = lon1-lon2;
+    let radtheta = Math.PI * theta/180;
+    let dist = Math.sin(radlat1) * Math.sin(radlat2) + Math.cos(radlat1) * Math.cos(radlat2) * Math.cos(radtheta);
+    if (dist > 1) dist = 1;
+    dist = Math.acos(dist);
+    dist = dist * 180/Math.PI;
+    dist = dist * 60 * 1.1515;
+    if (unit=="K") dist = dist * 1.609344;
+    if (unit=="N") dist = dist * 0.8684;
+    return dist;
 }
 
 
@@ -185,7 +227,7 @@ function updateCustomers(data) {
         let id = data.id;
         delete data.id;
         Customers.update(data, { where: { id } })
-            .then(_ => Customers.findOne({ where: { id }, attributes: { exclude: ['password', 'created_at', 'updated_at'] }}).then(customer => resolve(customer)))
+            .then(_ => Customers.findOne({ where: { id }, attributes: { exclude: ['password', 'created_at', 'updated_at'] } }).then(customer => resolve(customer)))
             .catch(err => reject(err));
     });
 }
@@ -232,7 +274,7 @@ function updateOrders(data) {
 // Services CRUD
 function getServices() {
     return new Promise((resolve, reject) => {
-        const include =  ["parentServices", "subservices"] 
+        const include = ["parentServices", "subservices"]
         Service.findAll({ include })
             .then(services => resolve(services))
             .catch(err => reject(err));
@@ -251,7 +293,7 @@ function updateService(data) {
 
 function addService(data) {
     return new Promise((resolve, reject) => {
-        Service.create(data, { include: [ SubService ] })
+        Service.create(data, { include: [SubService] })
             .then(services => resolve(services))
             .catch(err => reject(err));
     });
@@ -259,7 +301,7 @@ function addService(data) {
 
 function updateLocation(data) {
     return new Promise((resolve, reject) => {
-        Vendors.update({ lat:data.lat, long:data.long }, { where:{ id: data.user_id }})
+        Vendors.update({ lat: data.lat, long: data.long }, { where: { id: data.user_id } })
             .then(_ => resolve(true))
             .catch(err => reject(err));
     });
@@ -267,17 +309,17 @@ function updateLocation(data) {
 
 function getOrdersByCustomer(user_id) {
     return new Promise((resolve, reject) => {
-        const include = [{ model: Service }, { model:Vendors }];
+        const include = [{ model: Service }, { model: Vendors }];
 
-        ServiceOrders.findAll({ where:{ status: 'COMPLETED', customer_id: user_id }, include })
-                .then(bookings => resolve(bookings))
-                .catch(err => reject(err));
+        ServiceOrders.findAll({ where: { status: 'COMPLETED', customer_id: user_id }, include })
+            .then(bookings => resolve(bookings))
+            .catch(err => reject(err));
     });
 }
 
 function cancelServiceOrder(data) {
     return Promise((resolve, reject) => {
-        ServiceOrders.update({ status: 'CANCELLED' }, { where: { id: data.order_id }})
+        ServiceOrders.update({ status: 'CANCELLED' }, { where: { id: data.order_id } })
             .then(_ => resolve(true))
             .catch((err) => reject(err));
     });
