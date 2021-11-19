@@ -2,20 +2,17 @@
 type Subscription {
 	NEW_JOB_ALERT: Job
 	LOCATION_UPDATE: Location
-	ORDER_CANCEL: OrderCancel
-	ORDER_ACCEPTED: OrderAccepted
+	ORDER_STATUS: Order
 }
 
-type OrderCancel {
+type Order {
 	order_id: Int!
 	vendor_id: Int!
-}
-
-type OrderAccepted {
-	order_id: Int
-	vendor_id: Int
 	accepted_by: Int
 	customer_id: Int
+	reason: String
+	order_status: String
+	vendor_status: String
 }
 
 type Job {

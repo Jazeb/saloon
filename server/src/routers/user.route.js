@@ -16,13 +16,14 @@ router.post('/vendor/signup', userCrtl.userSignup);
 router.put('/vendor/update', authVendor, userCrtl.updateUser);
 router.post('/vendor/review', authVendor, userCrtl.submitReview);
 router.get('/vendor/:service_id', userCrtl.getVendersByServiceId);
-router.post('/vendor/order/end', authVendor, userCrtl.endService);
-router.post('/vendor/order/start', authVendor, userCrtl.startService);
-router.post('/vendor/order/accept', authVendor, userCrtl.acceptServiceOrder);
+
+router.post('/vendor/order/end', authVendor, userCrtl.endService); // send status = COMPLETED
+router.post('/vendor/order/start', authVendor, userCrtl.startService); // send status = ARRIVED DONE
+router.post('/vendor/order/accept', authVendor, userCrtl.acceptServiceOrder); // send status = ACCEPTED DONE
 
 router.post('/vendor/changePassword', authVendor, userCrtl.changePassword);
 router.post('/vendor/forgotPassword', userCrtl.forgotPassword);
-router.post('/vendor/updateLocation',authVendor, userCrtl.updateLocation);
+router.post('/vendor/updateLocation', authVendor, userCrtl.updateLocation);
 
 
 // customer APIs
@@ -36,7 +37,6 @@ router.post('/customer/review', authCustomer, userCrtl.submitReview);
 router.post('/customer/order/end', authCustomer, userCrtl.endService);
 router.post('/customer/order/cancel', authCustomer, userCrtl.cancelService);
 router.get('/customer/bookings', authCustomer, userCrtl.getCustomerBookings);
-
 
 router.post('/customer/changePassword', authCustomer, userCrtl.changePassword);
 router.post('/customer/forgotPassword', userCrtl.forgotPassword);

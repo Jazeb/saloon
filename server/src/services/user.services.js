@@ -24,7 +24,6 @@ module.exports = {
     updateVendors,
     getOrders,
     getServices,
-    updateService,
     addService,
     updateOrders,
     vendorSignup,
@@ -41,8 +40,7 @@ module.exports = {
     addCustomerNotification,
     addVendorNotification,
     updateLocation,
-    getOrdersByCustomer,
-    cancelServiceOrder
+    getOrdersByCustomer
 }
 
 function updateLogout(id, model) {
@@ -262,9 +260,7 @@ function getOrders() {
 
 function updateOrders(data) {
     return new Promise((resolve, reject) => {
-        let id = data.id;
-        delete data.id;
-        ServiceOrders.update(data, { where: { id } })
+        ServiceOrders.update(data, { where: { id:data.order_id } })
             .then(orders => resolve(orders))
             .catch(err => reject(err));
     });
@@ -314,13 +310,5 @@ function getOrdersByCustomer(user_id) {
         ServiceOrders.findAll({ where: { status: 'COMPLETED', customer_id: user_id }, include })
             .then(bookings => resolve(bookings))
             .catch(err => reject(err));
-    });
-}
-
-function cancelServiceOrder(data) {
-    return Promise((resolve, reject) => {
-        ServiceOrders.update({ status: 'CANCELLED' }, { where: { id: data.order_id } })
-            .then(_ => resolve(true))
-            .catch((err) => reject(err));
     });
 }

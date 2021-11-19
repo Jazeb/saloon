@@ -52,13 +52,15 @@ async function acceptServiceOrder(req, res) {
         const user_id = req.user.id;
         if (status == 'ACCEPT') {
             let data = {
-                id: order_id,
+                order_id,
                 state: 'ACCEPTED',
                 accepted_by: user_id,
                 vendor_id: user_id,
+                order_status: 'ACCEPTED',
                 customer_id: order.customer_id
             }
-            orderAcceptedSub(data);
+            sendOrderSubscription(data);
+
             userService.updateOrders(data)
                 .then(order => resp.success(res, order))
                 .catch(err => resp.error(res, 'Something went wrong', err));
@@ -84,13 +86,17 @@ async function startService(req, res) {
             return resp.error(res, 'This order is accepted by another vendor');
 
         const data = {
-            id: order_id,
+            order_id,
             status: 'ONGOING',
+            order_status: 'ONGOING',
+            vendor_status: 'ARRIVED',
             started_at: Date.now()
         }
-        userService.updateService(data)
+        userService.updateOrders(data)
             .then(_ => resp.success(res, 'Order is started'))
             .catch(err => resp.error(res, 'Something went wrong', err));
+
+        sendOrderSubscription(data);
 
     } catch (error) {
         console.error(error);
@@ -99,7 +105,6 @@ async function startService(req, res) {
 }
 
 async function endService(req, res) {
-    // Complete the current order
     try {
         const { order_id } = req.body;
         if (!order_id)
@@ -110,14 +115,19 @@ async function endService(req, res) {
             return resp.error(res, 'Invalid order id provided');
 
         const data = {
-            id: order_id,
+            order_id,
             status: 'COMPLETED',
-            completed_at: Date.now()
+            order_status: 'COMPLETED',
+            completed_at: Date.now(),
+            vendor_id: order.vendor_id,
+            accepted_by: order.vendor_id
         }
-        userService.updateService(data)
+
+        sendOrderSubscription(data);
+        
+        userService.updateOrders(data)
             .then(_ => resp.success(res, 'Order is completed'))
             .catch(err => resp.error(res, 'Something went wrong', err));
-        
         await userService.addVendorNotification();
 
     } catch (error) {
@@ -126,6 +136,7 @@ async function endService(req, res) {
     }
 }
 
+// cancel service order
 async function cancelService(req, res) {
     const { order_id, reason } = req.body;
     if(!order_id || !reason) return resp.error(res, 'Provide required fields');
@@ -134,10 +145,16 @@ async function cancelService(req, res) {
         const curr_order = await view.find('ORDER', 'id', order_id);
         if(_.isEmpty(curr_order) || ['COMPLETED', 'CANCELLED'].includes(curr_order.status))
             return resp.error(res, 'Cannot cancel already completed order');
-    
-        req.body.vendor_id = curr_order.vendor_id;
-        userService.cancelServiceOrder(req.body)
-            .then(orderCancelSub(req.body))
+
+        const data = {
+            reason,
+            order_id,
+            status: 'CANCELLED',
+            order_status: 'CANCELLED',
+        }
+        
+        userService.updateOrders(data)
+            .then(_ => sendOrderSubscription(data))
             .then(_ => resp.success(res, 'Order cancelled'))
             .catch(err => resp.error(res, 'Error updating service order', err));
         
@@ -147,21 +164,26 @@ async function cancelService(req, res) {
     }
 }
 
-function orderCancelSub(data) {
+function sendOrderSubscription(data) {
     let pubsub = require('../../graphql/pubsub');
-
-    pubsub.publish('ORDER_CANCEL', {
-        ORDER_CANCEL: { order_id: data.order_id, vendor_id: data.vendor_id }
-    });
+    return pubsub.publish('ORDER_STATUS', { ORDER_STATUS: data });
 }
 
-function orderAcceptedSub(data) {
-    let pubsub = require('../../graphql/pubsub');
+// function orderCancelSub(data) {
+//     let pubsub = require('../../graphql/pubsub');
 
-    pubsub.publish('ORDER_ACCEPTED', {
-        ORDER_ACCEPTED: { customer_id: data.customer_id, order_id: data.order_id, vendor_id: data.vendor_id, accepted_by:data.accepted_by }
-    });
-}
+//     pubsub.publish('ORDER_CANCEL', {
+//         ORDER_CANCEL: { order_id: data.order_id, vendor_id: data.vendor_id }
+//     });
+// }
+
+// function orderAcceptedSub(data) {
+//     let pubsub = require('../../graphql/pubsub');
+
+//     pubsub.publish('ORDER_ACCEPTED', {
+//         ORDER_ACCEPTED: { customer_id: data.customer_id, order_id: data.order_id, vendor_id: data.vendor_id, accepted_by:data.accepted_by }
+//     });
+// }
 
 async function placeService(req, res) {
     try {

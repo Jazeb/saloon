@@ -4,8 +4,7 @@ const resolvers = {
     Subscription: {
         NEW_JOB_ALERT: { subscribe: () => pubsub.asyncIterator(['NEW_JOB_ALERT'])},
         LOCATION_UPDATE: { subscribe: () => pubsub.asyncIterator(['LOCATION_UPDATE'])},
-        ORDER_CANCEL: { subscribe: () => pubsub.asyncIterator(['ORDER_CANCEL'])},
-        ORDER_ACCEPTED: { subscribe: () => pubsub.asyncIterator(['ORDER_ACCEPTED'])}
+        ORDER_STATUS: { subscribe: () => pubsub.asyncIterator(['ORDER_STATUS'])}
     },
 
     // this query is not used
