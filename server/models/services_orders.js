@@ -16,11 +16,11 @@ module.exports = function (sequelize, DataTypes) {
         },
         lat: {
             type: DataTypes.STRING(11),
-            allowNull: false
+            allowNull: true
         },
         lon: {
             type: DataTypes.STRING(11),
-            allowNull: false
+            allowNull: true
         },
         accepted_by: {
             type: DataTypes.INTEGER(11),
