@@ -122,7 +122,7 @@ function getVenderByServiceId(data) {
         const users = await Vendors.findAll({ where: { service_id:data.service_id }, include });
 
         for(let user of users) {
-            let dist = findDistance(user.lat, user.lon, data.lan, data.lon);
+            let dist = findDistance(user.lat, user.lon, data.lat, data.lon);
             if(dist <= 60) vendors.push(user);
             console.log({ dist });
         }
