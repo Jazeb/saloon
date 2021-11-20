@@ -18,7 +18,7 @@ type Order {
 type Job {
 	order_id: Int
 	lat: String!
-	long: String!
+	lon: String!
 	service_id: Int!
 	sub_service_id: Int
 	service_name: String
@@ -30,7 +30,7 @@ type Job {
 
 type Location {
 	lat: String!
-	long: String!
+	lon: String!
 	user_id: Int!
 }
 

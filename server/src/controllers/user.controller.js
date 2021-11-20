@@ -188,11 +188,11 @@ function sendOrderSubscription(data) {
 async function placeService(req, res) {
     try {
         const pubsub = require('../../graphql/pubsub');
-        const { lat, long, service_id, sub_service_id } = req.body;
-        if (!lat || !long || !service_id || !sub_service_id)
+        const { lat, lon, service_id, sub_service_id } = req.body;
+        if (!lat || !lon || !service_id || !sub_service_id)
             return resp.error(res, 'Provide required fields');
 
-        const order_data = { lat, long, service_id, sub_service_id };
+        const order_data = { lat, lon, service_id, sub_service_id };
 
         order_data['customer_id'] = req.user.id;
 
@@ -203,7 +203,7 @@ async function placeService(req, res) {
         const obj = {
         sub_service_id,
             customer_name: req.user.first_name + ' ' + req.user.last_name,
-            service_id, lat, long, order_id: service_data.id,
+            service_id, lat, lon, order_id: service_data.id,
             service_name: service.service_name,
             customer_image_url: req.user.image_url,
             customer_phone_no: req.user.phone_no,
@@ -491,12 +491,12 @@ function submitReview(req, res) {
 const stringToBoolean = string => string === 'false' ? false : !!string;
 
 function updateLocation(req, res) {
-    const { lat, long } = req.body;
-    if(!lat || !long) return resp.error(res, 'Provide lat and long');
+    const { lat, lon } = req.body;
+    if(!lat || !lon) return resp.error(res, 'Provide lat and lon');
 
     const user = req.user;
     const data = {
-        lat, long,
+        lat, lon,
         user_id: user.id,
     }
     userService.updateLocation(data)

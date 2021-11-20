@@ -122,7 +122,7 @@ function getVenderByServiceId(data) {
         const users = await Vendors.findAll({ where: { service_id:data.service_id }, include });
 
         for(let user of users) {
-            let dist = findDistance(user.lat, user.long, data.lan, data.lon);
+            let dist = findDistance(user.lat, user.lon, data.lan, data.lon);
             if(dist <= 60) vendors.push(user);
             console.log({ dist });
         }
@@ -297,7 +297,7 @@ function addService(data) {
 
 function updateLocation(data) {
     return new Promise((resolve, reject) => {
-        Vendors.update({ lat: data.lat, long: data.long }, { where: { id: data.user_id } })
+        Vendors.update({ lat: data.lat, lon: data.lon }, { where: { id: data.user_id } })
             .then(_ => resolve(true))
             .catch(err => reject(err));
     });

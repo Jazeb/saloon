@@ -34,7 +34,7 @@ module.exports = function (sequelize, DataTypes) {
             type: DataTypes.INTEGER(11),
             allowNull: true
         },
-        long: {
+        lon: {
             type: DataTypes.INTEGER(11),
             allowNull: true
         }
