@@ -7,6 +7,7 @@ exports.success = (res, result, message = "success") => {
 };
 
 exports.error = (res, message = "Unable to process request", err, errorCode = 400) => {
+    console.log({ err });
     res.status(errorCode).json({
         error: true,
         message: message,

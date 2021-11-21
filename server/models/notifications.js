@@ -8,10 +8,10 @@ module.exports = function (sequelize, DataTypes) {
             type: DataTypes.ENUM(['VENDOR', 'CUSTOMER']),
             allowNull: false
         },
-        // skip:{
-        //     type: DataTypes.BOOLEAN(),
-        //     default: false
-        // }
+        user_id: {
+            type: DataTypes.INTEGER(11),
+            allowNull: false
+        }
     }, {
         sequelize,
         tableName: 'notifications',

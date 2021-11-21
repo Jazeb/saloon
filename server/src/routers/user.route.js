@@ -21,6 +21,9 @@ router.post('/vendor/order/end', authVendor, userCrtl.endService); // send statu
 router.post('/vendor/order/start', authVendor, userCrtl.startService); // send status = ARRIVED DONE
 router.post('/vendor/order/accept', authVendor, userCrtl.acceptServiceOrder); // send status = ACCEPTED DONE
 
+router.get('/vendor/notifications', authVendor, userCrtl.getNotifications);
+router.get('/vendor/bookings', authVendor, userCrtl.getVendorBookings);
+
 router.post('/vendor/changePassword', authVendor, userCrtl.changePassword);
 router.post('/vendor/forgotPassword', userCrtl.forgotPassword);
 router.post('/vendor/updateLocation', authVendor, userCrtl.updateLocation);
@@ -37,6 +40,7 @@ router.post('/customer/review', authCustomer, userCrtl.submitReview);
 router.post('/customer/order/end', authCustomer, userCrtl.endService);
 router.post('/customer/order/cancel', authCustomer, userCrtl.cancelService);
 router.get('/customer/bookings', authCustomer, userCrtl.getCustomerBookings);
+router.get('/customer/notifications', authCustomer, userCrtl.getNotifications);
 
 router.post('/customer/changePassword', authCustomer, userCrtl.changePassword);
 router.post('/customer/forgotPassword', userCrtl.forgotPassword);

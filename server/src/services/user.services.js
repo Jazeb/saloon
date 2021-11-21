@@ -40,7 +40,9 @@ module.exports = {
     addCustomerNotification,
     addVendorNotification,
     updateLocation,
-    getOrdersByCustomer
+    getOrdersByCustomer,
+    getNotifications,
+    getOrdersByVendor
 }
 
 function updateLogout(id, model) {
@@ -51,7 +53,7 @@ function updateLogout(id, model) {
         if (model == 'VENDOR') Model = Vendors;
         else Model = Customers;
 
-        if(!Model) return console.error('model not defined');
+        if (!Model) return console.error('model not defined');
         Model.update({ fcm_key: null, is_login: false }, { where: { id } })
             .then(_ => resolve(true))
             .catch(err => reject(err));
@@ -119,11 +121,11 @@ function getVenderByServiceId(data) {
         const vendors = [];
 
         const include = [{ model: Service, include: [{ model: SubService }] }];
-        const users = await Vendors.findAll({ where: { service_id:data.service_id }, include });
+        const users = await Vendors.findAll({ where: { service_id: data.service_id }, include });
 
-        for(let user of users) {
+        for (let user of users) {
             let dist = findDistance(user.lat, user.lon, data.lat, data.lon);
-            if(dist <= 60) vendors.push(user);
+            if (dist <= 60) vendors.push(user);
             console.log({ dist });
         }
         return resolve(vendors);
@@ -131,18 +133,18 @@ function getVenderByServiceId(data) {
 }
 
 function findDistance(lat1, lon1, lat2, lon2, unit) {
-    console.log({lat1, lon1, lat2, lon2})
-    let radlat1 = Math.PI * lat1/180;
-    let radlat2 = Math.PI * lat2/180;
-    let theta = lon1-lon2;
-    let radtheta = Math.PI * theta/180;
+    console.log({ lat1, lon1, lat2, lon2 })
+    let radlat1 = Math.PI * lat1 / 180;
+    let radlat2 = Math.PI * lat2 / 180;
+    let theta = lon1 - lon2;
+    let radtheta = Math.PI * theta / 180;
     let dist = Math.sin(radlat1) * Math.sin(radlat2) + Math.cos(radlat1) * Math.cos(radlat2) * Math.cos(radtheta);
     if (dist > 1) dist = 1;
     dist = Math.acos(dist);
-    dist = dist * 180/Math.PI;
+    dist = dist * 180 / Math.PI;
     dist = dist * 60 * 1.1515;
-    if (unit=="K") dist = dist * 1.609344;
-    if (unit=="N") dist = dist * 0.8684;
+    if (unit == "K") dist = dist * 1.609344;
+    if (unit == "N") dist = dist * 0.8684;
     return dist;
 }
 
@@ -258,7 +260,7 @@ function getOrders() {
 
 function updateOrders(data) {
     return new Promise((resolve, reject) => {
-        ServiceOrders.update(data, { where: { id:data.order_id } })
+        ServiceOrders.update(data, { where: { id: data.order_id } })
             .then(orders => resolve(orders))
             .catch(err => reject(err));
     });
@@ -309,4 +311,23 @@ function getOrdersByCustomer(user_id) {
             .then(bookings => resolve(bookings))
             .catch(err => reject(err));
     });
+}
+
+function getOrdersByVendor(user_id) {
+    return new Promise((resolve, reject) => {
+        const include = [{ model: Service }, { model: Vendors }];
+
+        ServiceOrders.findAll({ where: { accepted_by }, include })
+            .then(bookings => resolve(bookings))
+            .catch(err => reject(err));
+    });
+}
+
+
+function getNotifications(user_id, user_type) {
+    return new Promise((resolve, reject) => {
+        Notifications.findAll({ where: { user_id, user_type } })
+            .then(bookings => resolve(bookings))
+            .catch(err => reject(err));
+    })
 }

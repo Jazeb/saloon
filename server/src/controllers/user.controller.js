@@ -24,7 +24,9 @@ module.exports = {
     submitReview,
     updateLocation,
     getCustomerBookings,
-    cancelService
+    cancelService,
+    getNotifications,
+    getVendorBookings
 }
 
 
@@ -532,6 +534,23 @@ function getCustomerBookings(req, res) {
     userService.getOrdersByCustomer(user_id)
         .then(bookings => resp.success(res, bookings))
         .catch(err => resp.error(res, 'Error getting bookings', err));
+}
+
+function getVendorBookings(req, res) {
+    console.log("***");
+    const user_id = req.user.id;
+    userService.getOrdersByVendor(user_id)
+        .then(bookings => resp.success(res, bookings))
+        .catch(err => resp.error(res, 'Error getting bookings', err));
+}
+
+function getNotifications(req, res) {
+    let id = req.user.id;
+    let user_type  = req.user.user_type;
+
+    userService.getNotifications(id, user_type)
+        .then(notifications => resp.success(res, notifications))
+        .catch(err => resp.error(res, 'Error getting notifications', err));
 }
 
 // remove fcm and update is_login key from user obj
