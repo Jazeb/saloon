@@ -183,18 +183,16 @@ function addCustomerReview(data) {
     });
 }
 
-function addVendorNotification() {
+function addVendorNotification(message) {
     return new Promise((resolve, reject) => {
-        const message = 'You order has been completed';
         Notifications.create({ message, user_type: 'VENDOR' })
             .then(_ => resolve(true))
             .catch(err => reject(err));
     });
 }
 
-function addCustomerNotification() {
+function addCustomerNotification(message) {
     return new Promise((resolve, reject) => {
-        const message = 'You job has been completed';
         Notifications.create({ message, user_type: 'CUSTOMER' })
             .then(_ => resolve(true))
             .catch(err => reject(err));

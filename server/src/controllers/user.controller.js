@@ -60,6 +60,9 @@ async function acceptServiceOrder(req, res) {
                 customer_id: order.customer_id
             }
             sendOrderSubscription(data);
+            let message = 'You job has been accepted';
+            await userService.addVendorNotification(message);
+            await userService.addCustomerNotification(message);
 
             userService.updateOrders(data)
                 .then(order => resp.success(res, order))
@@ -98,6 +101,10 @@ async function startService(req, res) {
 
         sendOrderSubscription(data);
 
+        let message = 'You job has been started';
+        await userService.addVendorNotification(message);
+        await userService.addCustomerNotification(message);
+
     } catch (error) {
         console.error(error);
         return resp.error(res, 'Something went wrong', error);
@@ -128,7 +135,10 @@ async function endService(req, res) {
         userService.updateOrders(data)
             .then(_ => resp.success(res, 'Order is completed'))
             .catch(err => resp.error(res, 'Something went wrong', err));
-        await userService.addVendorNotification();
+
+        let message = 'You job has been completed';
+        await userService.addVendorNotification(message);
+        await userService.addCustomerNotification(message);
 
     } catch (error) {
         console.error(error);
@@ -153,6 +163,10 @@ async function cancelService(req, res) {
             order_status: 'CANCELLED',
         }
         
+        let message = 'You job has been cancelled';
+        await userService.addVendorNotification(message);
+        await userService.addCustomerNotification(message);
+
         userService.updateOrders(data)
             .then(_ => sendOrderSubscription(data))
             .then(_ => resp.success(res, 'Order cancelled'))
@@ -201,7 +215,7 @@ async function placeService(req, res) {
         const service = await view.find('SERVICE', 'id', service_id);
 
         const obj = {
-        sub_service_id,
+            sub_service_id,
             customer_name: req.user.first_name + ' ' + req.user.last_name,
             service_id, lat, lon, order_id: service_data.id,
             service_name: service.service_name,
