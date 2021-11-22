@@ -26,7 +26,8 @@ module.exports = {
     getCustomerBookings,
     cancelService,
     getNotifications,
-    getVendorBookings
+    getVendorBookings,
+    arrivedOrderUpdate
 }
 
 
@@ -59,6 +60,7 @@ async function acceptServiceOrder(req, res) {
                 accepted_by: user_id,
                 vendor_id: user_id,
                 order_status: 'ACCEPTED',
+                vendor_status: 'ON_THE_WAY',
                 customer_id: order.customer_id
             }
             sendOrderSubscription(data);
@@ -71,6 +73,39 @@ async function acceptServiceOrder(req, res) {
                 .catch(err => resp.error(res, 'Something went wrong', err));
             
         }
+
+    } catch (error) {
+        console.error(error);
+        return resp.error(res, 'Something went wrong', error);
+    }
+}
+
+async function arrivedOrderUpdate(req, res) {
+    try {
+        const { order_id } = req.body;
+        if (!order_id) return resp.error(res, 'Provide order id');
+
+        const user_id = req.user.id;
+
+        const order = await view.find('ORDER', 'id', order_id);
+        if (_.isEmpty(order) || order.state !== 'ACCEPTED' || order.status !== 'PENDING' || order.accepted_by !== user_id)
+            return resp.error(res, 'Invalid order id provided');
+
+        let data = {
+            order_id,
+            state: order.state,
+            accepted_by: user_id,
+            vendor_id: user_id,
+            vendor_status: 'ARRIVED',
+            order_status: order.status,
+            customer_id: order.customer_id
+        }
+
+        sendOrderSubscription(data);
+
+        let message = 'Your vendor has arrived';
+        await userService.addVendorNotification(message);
+        await userService.addCustomerNotification(message);
 
     } catch (error) {
         console.error(error);

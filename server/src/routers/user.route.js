@@ -20,6 +20,7 @@ router.get('/vendor/:service_id', userCrtl.getVendersByServiceId);
 router.post('/vendor/order/end', authVendor, userCrtl.endService); // send status = COMPLETED
 router.post('/vendor/order/start', authVendor, userCrtl.startService); // send status = ARRIVED DONE
 router.post('/vendor/order/accept', authVendor, userCrtl.acceptServiceOrder); // send status = ACCEPTED DONE
+router.post('/vendor/order/arrived', authVendor, userCrtl.arrivedOrderUpdate); // send status = ARRIVED DONE
 
 router.get('/vendor/notifications', authVendor, userCrtl.getNotifications);
 router.get('/vendor/bookings', authVendor, userCrtl.getVendorBookings);
