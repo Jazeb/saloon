@@ -63,15 +63,21 @@ async function acceptServiceOrder(req, res) {
                 vendor_status: 'ON_THE_WAY',
                 customer_id: order.customer_id
             }
+
             sendOrderSubscription(data);
-            let message = 'You job has been accepted';
+
+            let message = 'Your job has been accepted';
+
             await userService.addVendorNotification(message);
             await userService.addCustomerNotification(message);
 
+            const customer = await view.find('CUSTOMER', 'id', order.customer_id);
+
+            data.customer = customer;
+
             userService.updateOrders(data)
-                .then(order => resp.success(res, order))
-                .catch(err => resp.error(res, 'Something went wrong', err));
-            
+                .then(_ => resp.success(res, data))
+                .catch(err => resp.error(res, 'Something went wrong', err));   
         }
 
     } catch (error) {
@@ -90,6 +96,8 @@ async function arrivedOrderUpdate(req, res) {
         const order = await view.find('ORDER', 'id', order_id);
         if (_.isEmpty(order) || order.state !== 'ACCEPTED' || order.status !== 'PENDING' || order.accepted_by !== user_id)
             return resp.error(res, 'Invalid order id provided');
+
+        resp.success(res, 'vendor arrived event sent');
 
         let data = {
             order_id,
