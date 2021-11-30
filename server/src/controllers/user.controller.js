@@ -168,6 +168,9 @@ async function endService(req, res) {
 
         const data = {
             order_id,
+            price: order.price,
+            tax: order.tax,
+            total_price: order.total_price,
             status: 'COMPLETED',
             order_status: 'COMPLETED',
             completed_at: Date.now(),

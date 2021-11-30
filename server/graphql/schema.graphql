@@ -11,6 +11,9 @@ type Order {
 	accepted_by: Int
 	customer_id: Int
 	reason: String
+	price: Int
+	tax: Int
+	total_price: Int
 	order_status: String
 	vendor_status: String
 }
