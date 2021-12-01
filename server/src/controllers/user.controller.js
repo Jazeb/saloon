@@ -78,7 +78,7 @@ async function acceptServiceOrder(req, res) {
             await userService.addVendorNotification(notif_data);
 
             notif_data.user_id = order.customer_id;
-            await userService.addCustomerNotification(message);
+            await userService.addCustomerNotification(notif_data);
             
             data.customer = customer;
             userService.updateOrders(data)
