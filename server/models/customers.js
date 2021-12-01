@@ -33,6 +33,10 @@ module.exports = function (sequelize, DataTypes) {
         image_url: {
             type: DataTypes.STRING(255),
             allowNull: true
+        },
+        fcm_token: {
+            type: DataTypes.STRING(255),
+            allowNull: false
         }
     }, {
         sequelize,

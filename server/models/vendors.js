@@ -37,6 +37,10 @@ module.exports = function (sequelize, DataTypes) {
         lon: {
             type: DataTypes.INTEGER(11),
             allowNull: true
+        },
+        fcm_token: {
+            type: DataTypes.STRING(255),
+            allowNull: false
         }
     }, {
         sequelize,

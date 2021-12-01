@@ -7,6 +7,7 @@ const userService = require('../services/user.services');
 const mailer = require("../../config/mailer");
 const resp = require('../../config/api.response');
 const view = require('../../utils/views');
+const fcm = require('../../../pushNotifications');
 
 module.exports = {
     login,
@@ -52,7 +53,10 @@ async function acceptServiceOrder(req, res) {
         if (_.isEmpty(order) || order.state !== 'PENDING' || order.status !== 'PENDING')
             return resp.error(res, 'Invalid order id provided');
 
-        const user_id = req.user.id;
+        let user_id = req.user.id;
+        let customer = await view.find('CUSTOMER', 'id', order.customer_id);
+
+        
         if (status == 'ACCEPT') {
             let data = {
                 order_id,
@@ -70,15 +74,21 @@ async function acceptServiceOrder(req, res) {
 
             await userService.addVendorNotification(message);
             await userService.addCustomerNotification(message);
-
-            const customer = await view.find('CUSTOMER', 'id', order.customer_id);
-
+            
             data.customer = customer;
-
             userService.updateOrders(data)
                 .then(_ => resp.success(res, data))
                 .catch(err => resp.error(res, 'Something went wrong', err));   
         }
+
+        let vendor_name = req.user.first_name + ' ' + req.user.last_name;
+        let fcm_obj = {
+            reg_id: customer.fcm_token,
+            title: `Order is ${status}ED by the Vendor`,
+            body: `You order is ${status}ED by the vendor ${vendor_name}`
+        }
+
+        return await fcm.sendNotification(fcm_obj);
 
     } catch (error) {
         console.error(error);
@@ -115,6 +125,16 @@ async function arrivedOrderUpdate(req, res) {
         await userService.addVendorNotification(message);
         await userService.addCustomerNotification(message);
 
+        let customer = await view.find('CUSTOMER', 'id', order.customer_id);
+
+        let vendor_name = req.user.first_name + ' ' + req.user.last_name;
+        let fcm_obj = {
+            reg_id: customer.fcm_token,
+            title: `Vendor has arrived`,
+            body: `Your vendor ${vendor_name} arrived at your destination`
+        }
+        return await fcm.sendNotification(fcm_obj);
+
     } catch (error) {
         console.error(error);
         return resp.error(res, 'Something went wrong', error);
@@ -150,6 +170,17 @@ async function startService(req, res) {
         await userService.addVendorNotification(message);
         await userService.addCustomerNotification(message);
 
+        let customer = await view.find('CUSTOMER', 'id', order.customer_id);
+
+        let vendor_name = req.user.first_name + ' ' + req.user.last_name;
+        let fcm_obj = {
+            reg_id: customer.fcm_token,
+            title: `Order is started`,
+            body: `You order is started by the vendor ${vendor_name}`
+        }
+
+        return await fcm.sendNotification(fcm_obj);
+
     } catch (error) {
         console.error(error);
         return resp.error(res, 'Something went wrong', error);
@@ -184,6 +215,18 @@ async function endService(req, res) {
         let message = 'You job has been completed';
         await userService.addVendorNotification(message);
         await userService.addCustomerNotification(message);
+
+        let customer = await view.find('CUSTOMER', 'id', order.customer_id);
+
+        let vendor_name = req.user.first_name + ' ' + req.user.last_name;
+        let fcm_obj = {
+            reg_id: customer.fcm_token,
+            title: `Your order is completed`,
+            body: `Your vendor ${vendor_name} has marked your order as completed`
+        }
+
+        return await fcm.sendNotification(fcm_obj);
+        
 
     } catch (error) {
         console.error(error);
@@ -273,6 +316,13 @@ async function placeService(req, res) {
         pubsub.publish('NEW_JOB_ALERT', {
             NEW_JOB_ALERT: obj
         });
+
+        const fcm_obj = {
+            reg_id: req.user.fcm_token,
+            title: 'Order placed successfully',
+            body: `You order for ${service.name} has been successfully placed`
+        }
+        fcm.sendNotification(fcm_obj);
 
         return resp.success(res, order_data, 'Service posted');
 
