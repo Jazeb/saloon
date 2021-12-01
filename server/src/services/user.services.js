@@ -185,17 +185,17 @@ function addCustomerReview(data) {
     });
 }
 
-function addVendorNotification(message) {
+function addVendorNotification(data) {
     return new Promise((resolve, reject) => {
-        Notifications.create({ message, user_type: 'VENDOR' })
+        Notifications.create({ user_id: data.user_id, message:data.message, user_type: 'VENDOR' })
             .then(_ => resolve(true))
             .catch(err => reject(err));
     });
 }
 
-function addCustomerNotification(message) {
+function addCustomerNotification(data) {
     return new Promise((resolve, reject) => {
-        Notifications.create({ message, user_type: 'CUSTOMER' })
+        Notifications.create({ message:data.message, user_id:data.user_id, user_type: 'CUSTOMER' })
             .then(_ => resolve(true))
             .catch(err => reject(err));
     });

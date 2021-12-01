@@ -92,7 +92,6 @@ async function acceptServiceOrder(req, res) {
             title: `Order is ${status}ED by the Vendor`,
             body: `You order is ${status}ED by the vendor ${vendor_name}`
         }
-        return
 
         return await fcm.sendNotification(fcm_obj);
 
@@ -127,9 +126,14 @@ async function arrivedOrderUpdate(req, res) {
 
         sendOrderSubscription(data);
 
-        let message = 'Your vendor has arrived';
-        await userService.addVendorNotification(message);
-        await userService.addCustomerNotification(message);
+        let notif_data = {
+            user_id,
+            message: 'Your vendor has arrived'
+        }
+        await userService.addVendorNotification(notif_data);
+
+        notif_data.user_id = user_id;
+        await userService.addCustomerNotification(notif_data);
 
         let customer = await view.find('CUSTOMER', 'id', order.customer_id);
 
@@ -139,7 +143,7 @@ async function arrivedOrderUpdate(req, res) {
             title: `Vendor has arrived`,
             body: `Your vendor ${vendor_name} arrived at your destination`
         }
-        return
+
         return await fcm.sendNotification(fcm_obj);
 
     } catch (error) {
@@ -173,9 +177,16 @@ async function startService(req, res) {
 
         sendOrderSubscription(data);
 
-        let message = 'You job has been started';
-        await userService.addVendorNotification(message);
-        await userService.addCustomerNotification(message);
+        let notif_data = {
+            user_id,
+            message: 'You job has been started'
+        }
+
+        await userService.addVendorNotification(notif_data);
+
+        notif_data.user_id = user_id;
+
+        await userService.addCustomerNotification(notif_data);
 
         let customer = await view.find('CUSTOMER', 'id', order.customer_id);
 
@@ -186,7 +197,6 @@ async function startService(req, res) {
             body: `You order is started by the vendor ${vendor_name}`
         }
 
-        return
         return await fcm.sendNotification(fcm_obj);
 
     } catch (error) {
@@ -223,9 +233,16 @@ async function endService(req, res) {
             .then(_ => resp.success(res, 'Order is completed'))
             .catch(err => resp.error(res, 'Something went wrong', err));
 
-        let message = 'You job has been completed';
-        await userService.addVendorNotification(message);
-        await userService.addCustomerNotification(message);
+        let notif_data = {
+            user_id,
+            message: 'You job has been completed'
+        }
+
+        await userService.addVendorNotification(notif_data);
+
+        notif_data.user_id = user_id;
+
+        await userService.addCustomerNotification(notif_data);
 
         let customer = await view.find('CUSTOMER', 'id', order.customer_id);
 
@@ -235,9 +252,8 @@ async function endService(req, res) {
             title: `Your order is completed`,
             body: `Your vendor ${vendor_name} has marked your order as completed`
         }
-        return
+
         return await fcm.sendNotification(fcm_obj);
-        
 
     } catch (error) {
         console.error(error);
@@ -262,9 +278,16 @@ async function cancelService(req, res) {
             order_status: 'CANCELLED',
         }
         
-        let message = 'You job has been cancelled';
-        await userService.addVendorNotification(message);
-        await userService.addCustomerNotification(message);
+        let notif_data = {
+            user_id,
+            message: 'You job has been cancelled'
+        }
+
+        await userService.addVendorNotification(notif_data);
+        
+        notif_data.user_id = user_id;
+
+        await userService.addCustomerNotification(notif_data);
 
         userService.updateOrders(data)
             .then(_ => sendOrderSubscription(data))
@@ -273,7 +296,7 @@ async function cancelService(req, res) {
         
     } catch (err) {
         console.error(err);
-        return resp.error(res, 'Error updating service order', err)
+        return resp.error(res, 'Error updating service order', err);
     }
 }
 
@@ -333,9 +356,9 @@ async function placeService(req, res) {
             title: 'Order placed successfully',
             body: `You order for ${service.name} has been successfully placed`
         }
-        //fcm.sendNotification(fcm_obj);
 
-        return resp.success(res, order_data, 'Service posted');
+        resp.success(res, order_data, 'Service posted');
+        return await fcm.sendNotification(fcm_obj);
 
     } catch (error) {
         console.log(error);
