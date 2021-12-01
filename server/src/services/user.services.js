@@ -305,7 +305,7 @@ function updateLocation(data) {
 
 function getOrdersByCustomer(user_id) {
     return new Promise((resolve, reject) => {
-        const include = [{ model: Service }, { model: Vendors }];
+        const include = [{ model: Service, include: [{ model: SubService }] } , { model: Vendors }];
 
         ServiceOrders.findAll({ where: { status: 'COMPLETED', customer_id: user_id }, include })
             .then(bookings => resolve(bookings))
@@ -318,7 +318,7 @@ function getOrdersByVendor(user_id) {
         const include = [{ model: Service }, { model: Vendors }];
 
         ServiceOrders.findAll({ where: { accepted_by }, include })
-            .then(bookings => resolve(bookings))
+            .then(orders => resolve(orders))
             .catch(err => reject(err));
     });
 }
@@ -327,7 +327,7 @@ function getOrdersByVendor(user_id) {
 function getNotifications(user_id, user_type) {
     return new Promise((resolve, reject) => {
         Notifications.findAll({ where: { user_id, user_type } })
-            .then(bookings => resolve(bookings))
+            .then(notifications => resolve(notifications))
             .catch(err => reject(err));
     })
 }

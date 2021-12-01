@@ -70,9 +70,14 @@ async function acceptServiceOrder(req, res) {
 
             sendOrderSubscription(data);
 
-            let message = 'Your job has been accepted';
+            let notif_data = {
+                user_id,
+                message: 'Your job has been accepted'
+            }
 
-            await userService.addVendorNotification(message);
+            await userService.addVendorNotification(notif_data);
+            
+            notif_data.user_id = order.customer_id;
             await userService.addCustomerNotification(message);
             
             data.customer = customer;
