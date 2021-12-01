@@ -41,11 +41,20 @@ module.exports = function (sequelize, DataTypes) {
             allowNull: true,
             defaultValue: null
         },
-        completed_at:{
+        completed_at: {
             type: DataTypes.DATE,
             allowNull: true,
             defaultValue: null
         },
+        price:{
+            type: DataTypes.INTEGER(11)
+        },
+        tax:{
+            type: DataTypes.INTEGER(11)
+        },
+        total_price:{
+            type: DataTypes.INTEGER(11)
+        }
     }, {
         sequelize,
         tableName: 'services_orders',
