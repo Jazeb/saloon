@@ -317,7 +317,7 @@ function getOrdersByVendor(user_id) {
     return new Promise((resolve, reject) => {
         const include = [{ model: Service }, { model: Vendors }];
 
-        ServiceOrders.findAll({ where: { accepted_by }, include })
+        ServiceOrders.findAll({ where: { accepted_by:user_id }, include })
             .then(orders => resolve(orders))
             .catch(err => reject(err));
     });
