@@ -42,7 +42,8 @@ module.exports = {
     updateLocation,
     getOrdersByCustomer,
     getNotifications,
-    getOrdersByVendor
+    getOrdersByVendor,
+    updateFCM
 }
 
 function updateLogout(id, model) {
@@ -330,4 +331,11 @@ function getNotifications(user_id, user_type) {
             .then(notifications => resolve(notifications))
             .catch(err => reject(err));
     })
+}
+
+function updateFCM(user_type, fcm_token, id) {
+    return new Promise((resolve, reject) => {
+        const model = user_type == 'VENDOR' ? Vendors : Customers;
+        model.update({ fcm_token }, { where: { id }}).then(_ => resolve(true)).catch(err => reject(err));
+    });
 }

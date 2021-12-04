@@ -28,7 +28,8 @@ module.exports = {
     cancelService,
     getNotifications,
     getVendorBookings,
-    arrivedOrderUpdate
+    arrivedOrderUpdate,
+    updateFCM
 }
 
 
@@ -483,7 +484,6 @@ async function updateUser(req, res) {
 }
 
 async function login(req, res) {
-    console.log(req.body)
     try {
         const { email, password } = req.body;
 
@@ -680,7 +680,13 @@ function getNotifications(req, res) {
         .catch(err => resp.error(res, 'Error getting notifications', err));
 }
 
-// remove fcm and update is_login key from user obj
-function logOut(req, res) {
+function updateFCM(req, res) {
+    let fcm_token = req.body.fcm_token;
+    if(!fcm_token) return resp.error(res, 'Provide FCM Token');
+
+    let { user_type, id } = req.user;
+    userService.updateFCM(user_type, fcm_token, id)
+        .then(_ => resp.success(res, 'FCM Token updated successfully'))
+        .catch(err => resp.error(res, 'Somthing went wrong', err.message));
 
 }

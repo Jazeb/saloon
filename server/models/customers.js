@@ -37,7 +37,15 @@ module.exports = function (sequelize, DataTypes) {
         fcm_token: {
             type: DataTypes.STRING(255),
             allowNull: false
-        }
+        },
+        lat: {
+            type: DataTypes.STRING(20),
+            allowNull: true
+        },
+        lon: {
+            type: DataTypes.STRING(20),
+            allowNull: true
+        },
     }, {
         sequelize,
         tableName: 'customers',

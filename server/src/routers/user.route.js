@@ -29,6 +29,8 @@ router.post('/vendor/changePassword', authVendor, userCrtl.changePassword);
 router.post('/vendor/forgotPassword', userCrtl.forgotPassword);
 router.post('/vendor/updateLocation', authVendor, userCrtl.updateLocation);
 
+router.put('/vendor/updateFCM', authVendor, userCrtl.updateFCM);
+
 
 // customer APIs
 router.post('/customer/logout', authCustomer, userCrtl.logout);
@@ -46,6 +48,7 @@ router.get('/customer/notifications', authCustomer, userCrtl.getNotifications);
 router.post('/customer/changePassword', authCustomer, userCrtl.changePassword);
 router.post('/customer/forgotPassword', userCrtl.forgotPassword);
 
+router.put('/vendor/updateFCM', authCustomer, userCrtl.updateFCM);
 
 
 module.exports = router;
