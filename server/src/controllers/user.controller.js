@@ -123,7 +123,7 @@ async function arrivedOrderUpdate(req, res) {
 
         let data = {
             order_id,
-            vendor_contact: req.user.phone_no,
+            vendor: req.user,
             state: order.state,
             accepted_by: user_id,
             vendor_id: user_id,
