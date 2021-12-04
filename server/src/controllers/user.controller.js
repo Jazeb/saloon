@@ -156,13 +156,16 @@ async function arrivedOrderUpdate(req, res) {
 async function startService(req, res) {
     try {
         const { order_id } = req.body;
+        const user_id = req.user.id;
         if (!order_id) return resp.error(res, 'Provide required fields');
-
+        
         const order = await view.find('ORDER', 'id', order_id);
         if (_.isEmpty(order) || order.state !== 'ACCEPTED' || order.status !== 'PENDING')
-            return resp.error(res, 'Invalid order id provided');
-
-        if (order.accepted_by !== req.user.id)
+        return resp.error(res, 'Invalid order id provided');
+        
+        let should_return = false;
+        
+        if (order.accepted_by !== user_id)
             return resp.error(res, 'This order is accepted by another vendor');
 
         const data = {
@@ -174,8 +177,13 @@ async function startService(req, res) {
         }
         userService.updateOrders(data)
             .then(_ => resp.success(res, 'Order is started'))
-            .catch(err => resp.error(res, 'Something went wrong', err));
+            .catch(err => {
+                resp.error(res, 'Something went wrong', err);
+                should_return = true;
+            });
 
+        if(should_return) return;
+        
         sendOrderSubscription(data);
 
         let notif_data = {
