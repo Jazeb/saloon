@@ -80,7 +80,7 @@ async function acceptServiceOrder(req, res) {
             await userService.addVendorNotification(notif_data);
 
             notif_data.user_id = order.customer_id;
-            
+
             await userService.addCustomerNotification(notif_data);
             
             data.customer = customer;
@@ -219,10 +219,12 @@ async function startService(req, res) {
 
 async function endService(req, res) {
     try {
+        let should_return = false;
         const { order_id } = req.body;
         if (!order_id)
             return resp.error(res, 'Provide required fields');
 
+        const user_id = req.user.id;
         const order = await view.find('ORDER', 'id', order_id);
         if (_.isEmpty(order) || order.state !== 'ACCEPTED' || order.status !== 'ONGOING')
             return resp.error(res, 'Invalid order id provided');
@@ -243,8 +245,13 @@ async function endService(req, res) {
         
         userService.updateOrders(data)
             .then(_ => resp.success(res, 'Order is completed'))
-            .catch(err => resp.error(res, 'Something went wrong', err));
+            .catch(err => {
+                resp.error(res, 'Something went wrong', err);
+                should_return = true;
+            });
 
+        if(should_return) return;
+        
         let notif_data = {
             user_id,
             message: 'You job has been completed'
