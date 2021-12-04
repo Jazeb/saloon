@@ -14,6 +14,8 @@ const find = (table_name, key, value) => {
         if (table_name == 'SERVICE') Model = Service;
         if (table_name == 'CUSTOMER') Model = Customers;
         if (table_name == 'ORDER') Model = ServiceOrders;
+        if (table_name == 'SUB_SERVICE') Model = SubService;
+        
         !Model && console.error('Invalid model name');
 
         Model && Model.findOne({ where: { [key]: value }, raw: true }).then(data => resolve(data))

@@ -54,12 +54,15 @@ async function acceptServiceOrder(req, res) {
         if (_.isEmpty(order) || order.state !== 'PENDING' || order.status !== 'PENDING')
             return resp.error(res, 'Invalid order id provided');
 
+        const sub_serivce = await view.find('SUB_SERVICE', 'service_id', order.service_id);
+
         let user_id = req.user.id;
         let customer = await view.find('CUSTOMER', 'id', order.customer_id);
 
         
         if (status == 'ACCEPT') {
             let data = {
+                sub_serivce,
                 order,
                 order_id,
                 state: 'ACCEPTED',
@@ -251,7 +254,7 @@ async function endService(req, res) {
             });
 
         if(should_return) return;
-        
+
         let notif_data = {
             user_id,
             message: 'You job has been completed'
