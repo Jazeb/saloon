@@ -60,6 +60,7 @@ async function acceptServiceOrder(req, res) {
         
         if (status == 'ACCEPT') {
             let data = {
+                order,
                 order_id,
                 state: 'ACCEPTED',
                 accepted_by: user_id,
@@ -79,9 +80,11 @@ async function acceptServiceOrder(req, res) {
             await userService.addVendorNotification(notif_data);
 
             notif_data.user_id = order.customer_id;
+            
             await userService.addCustomerNotification(notif_data);
             
             data.customer = customer;
+
             userService.updateOrders(data)
                 .then(_ => resp.success(res, data))
                 .catch(err => resp.error(res, 'Something went wrong', err));   
