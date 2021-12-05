@@ -22,9 +22,10 @@ type Order {
 type Vendor {
 	lat: String!
 	lon: String!
-	first_name: String!
-	last_name: String!
-	phone_no: String!
+	first_name: String
+	last_name: String
+	phone_no: String
+	image_url: String
 }
 
 type Job {
