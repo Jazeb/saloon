@@ -100,7 +100,7 @@ async function acceptServiceOrder(req, res) {
             body: `You order is ${status}ED by the vendor ${vendor_name}`
         }
 
-        return await fcm.sendNotification(fcm_obj);
+        // return await fcm.sendNotification(fcm_obj);
 
     } catch (error) {
         console.error(error);
@@ -152,7 +152,7 @@ async function arrivedOrderUpdate(req, res) {
             body: `Your vendor ${vendor_name} arrived at your destination`
         }
 
-        return await fcm.sendNotification(fcm_obj);
+        // return await fcm.sendNotification(fcm_obj);
 
     } catch (error) {
         console.error(error);
@@ -213,7 +213,7 @@ async function startService(req, res) {
             body: `You order is started by the vendor ${vendor_name}`
         }
 
-        return await fcm.sendNotification(fcm_obj);
+        // return await fcm.sendNotification(fcm_obj);
 
     } catch (error) {
         console.error(error);
@@ -276,7 +276,7 @@ async function endService(req, res) {
             body: `Your vendor ${vendor_name} has marked your order as completed`
         }
 
-        return await fcm.sendNotification(fcm_obj);
+        // return await fcm.sendNotification(fcm_obj);
 
     } catch (error) {
         console.error(error);
@@ -381,7 +381,7 @@ async function placeService(req, res) {
         }
 
         resp.success(res, order_data, 'Service posted');
-        return await fcm.sendNotification(fcm_obj);
+        // return await fcm.sendNotification(fcm_obj);
 
     } catch (error) {
         console.log(error);
