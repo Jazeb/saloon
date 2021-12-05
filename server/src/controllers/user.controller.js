@@ -686,7 +686,6 @@ function getCustomerBookings(req, res) {
 }
 
 function getVendorBookings(req, res) {
-    console.log("***");
     const user_id = req.user.id;
     userService.getOrdersByVendor(user_id)
         .then(bookings => resp.success(res, bookings))

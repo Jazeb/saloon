@@ -306,17 +306,25 @@ function updateLocation(data) {
 
 function getOrdersByCustomer(user_id) {
     return new Promise((resolve, reject) => {
-        const include = [{ model: Service, include: [{ model: SubService }] } , { model: Vendors }];
+        const include = [{ model: Service, include: [{ model: SubService }] }];
 
         ServiceOrders.findAll({ where: { status: 'COMPLETED', customer_id: user_id }, include })
-            .then(bookings => resolve(bookings))
+            .then(async result => {
+                const bookings = [];
+                for(let booking of result) {
+                    booking = booking.toJSON();
+                    booking.vendor = await Vendors.findOne({ where:{ id: booking.vendor_id }, raw:true });
+                    bookings.push(booking);
+                }
+                return resolve(bookings);
+            })
             .catch(err => reject(err));
     });
 }
 
 function getOrdersByVendor(user_id) {
     return new Promise((resolve, reject) => {
-        const include = [{ model: Service }, { model: Vendors }];
+        const include = [{ model: Service }, { model: Customers }];
 
         ServiceOrders.findAll({ where: { accepted_by:user_id }, include })
             .then(orders => resolve(orders))

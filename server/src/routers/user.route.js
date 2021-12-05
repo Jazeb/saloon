@@ -15,7 +15,6 @@ router.post('/vendor/logout', authVendor, userCrtl.logout);
 router.post('/vendor/signup', userCrtl.userSignup);
 router.put('/vendor/update', authVendor, userCrtl.updateUser);
 router.post('/vendor/review', authVendor, userCrtl.submitReview);
-router.get('/vendor/:service_id', userCrtl.getVendersByServiceId);
 
 router.post('/vendor/order/end', authVendor, userCrtl.endService); // send status = COMPLETED
 router.post('/vendor/order/start', authVendor, userCrtl.startService); // send status = ARRIVED DONE
@@ -31,6 +30,7 @@ router.post('/vendor/updateLocation', authVendor, userCrtl.updateLocation);
 
 router.put('/vendor/updateFCM', authVendor, userCrtl.updateFCM);
 
+router.get('/vendor/:service_id', userCrtl.getVendersByServiceId);
 
 // customer APIs
 router.post('/customer/logout', authCustomer, userCrtl.logout);
@@ -48,7 +48,7 @@ router.get('/customer/notifications', authCustomer, userCrtl.getNotifications);
 router.post('/customer/changePassword', authCustomer, userCrtl.changePassword);
 router.post('/customer/forgotPassword', userCrtl.forgotPassword);
 
-router.put('/vendor/updateFCM', authCustomer, userCrtl.updateFCM);
+router.put('/customer/updateFCM', authCustomer, userCrtl.updateFCM);
 
 
 module.exports = router;
