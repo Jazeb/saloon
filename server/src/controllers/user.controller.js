@@ -68,8 +68,8 @@ async function acceptServiceOrder(req, res) {
                 state: 'ACCEPTED',
                 accepted_by: user_id,
                 vendor_id: user_id,
-                order_status: 'ACCEPTED',
-                vendor_status: 'ON_THE_WAY',
+                order_status: 'ON_THE_WAY',
+                // vendor_status: 'ON_THE_WAY',
                 customer_id: order.customer_id
             }
 
@@ -127,8 +127,8 @@ async function arrivedOrderUpdate(req, res) {
             state: order.state,
             accepted_by: user_id,
             vendor_id: user_id,
-            vendor_status: 'ARRIVED',
-            order_status: order.status,
+            // vendor_status: 'ARRIVED',
+            order_status: 'ARRIVED',
             customer_id: order.customer_id
         }
 
@@ -178,8 +178,8 @@ async function startService(req, res) {
         const data = {
             order_id,
             status: 'ONGOING',
-            order_status: 'ONGOING',
-            vendor_status: 'ARRIVED',
+            order_status: 'ARRIVED',
+            // vendor_status: 'ARRIVED',
             started_at: Date.now()
         }
         userService.updateOrders(data)
