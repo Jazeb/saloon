@@ -380,7 +380,7 @@ async function placeService(req, res) {
             body: `You order for ${service.name} has been successfully placed`
         }
 
-        resp.success(res, order_data, 'Service posted');
+        resp.success(res, service_data, 'Service posted');
         // return await fcm.sendNotification(fcm_obj);
 
     } catch (error) {
