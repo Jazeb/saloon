@@ -300,11 +300,13 @@ async function cancelService(req, res) {
             order_id,
             status: 'CANCELLED',
             order_status: 'CANCELLED',
+            cancelled_by_id: user_id,
+            cancelled_by: req.user.user_type
         }
         
         let notif_data = {
             user_id,
-            message: 'You job has been cancelled'
+            message: 'Your job has been cancelled'
         }
 
         await userService.addVendorNotification(notif_data);

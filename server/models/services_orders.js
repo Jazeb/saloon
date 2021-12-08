@@ -22,6 +22,14 @@ module.exports = function (sequelize, DataTypes) {
             type: DataTypes.STRING(11),
             allowNull: true
         },
+        cancelled_by: {
+            type: DataTypes.STRING(11),
+            allowNull: true
+        },
+        cancelled_by_id: {
+            type: DataTypes.INTEGER(11),
+            allowNull: true
+        },
         accepted_by: {
             type: DataTypes.INTEGER(11),
             allowNull: true
