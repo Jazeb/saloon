@@ -294,6 +294,7 @@ async function cancelService(req, res) {
         if(_.isEmpty(curr_order) || ['COMPLETED', 'CANCELLED'].includes(curr_order.status))
             return resp.error(res, 'Cannot cancel already completed order');
 
+        const user_id = req.user.id;
         const data = {
             reason,
             order_id,
