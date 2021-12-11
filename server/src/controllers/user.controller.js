@@ -188,6 +188,7 @@ async function startService(req, res) {
         const data = {
             order_id,
             status: 'ONGOING',
+            customer_id: order.customer_id,
             order_status: 'ONGOING',
             // vendor_status: 'ARRIVED',
             started_at: Date.now()
