@@ -178,7 +178,7 @@ async function startService(req, res) {
         
         const order = await view.find('ORDER', 'id', order_id);
         if (_.isEmpty(order) || order.state !== 'ACCEPTED' || order.status !== 'PENDING')
-        return resp.error(res, 'Invalid order id provided');
+            return resp.error(res, 'Invalid order id provided');
         
         let should_return = false;
         
@@ -188,7 +188,7 @@ async function startService(req, res) {
         const data = {
             order_id,
             status: 'ONGOING',
-            order_status: 'ARRIVED',
+            order_status: 'ONGOING',
             // vendor_status: 'ARRIVED',
             started_at: Date.now()
         }
