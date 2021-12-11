@@ -77,8 +77,9 @@ async function acceptServiceOrder(req, res) {
         }
 
         if(status == 'REJECT') {
+            data.rejected_by_id = user_id;
             data.order_status = 'REJECTED';
-            data.cancelled_by = user_id;
+            data.rejected_by = req.user.user_type;
         }
         else if (status == 'ACCEPT') {
 
