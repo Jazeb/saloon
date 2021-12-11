@@ -69,7 +69,8 @@ async function acceptServiceOrder(req, res) {
             // order_status: 'ON_THE_WAY',
             // vendor_status: 'ON_THE_WAY',
             customer_id: order.customer_id,
-            vendor: req.user
+            vendor: req.user,
+            customer: customer
         }
 
         const notif_data = {
@@ -91,7 +92,7 @@ async function acceptServiceOrder(req, res) {
         }
 
         sendOrderSubscription(data);
-        
+
         Promise.all([
             userService.addVendorNotification(notif_data),
             userService.addCustomerNotification(notif_data),
