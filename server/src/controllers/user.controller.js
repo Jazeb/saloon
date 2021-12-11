@@ -90,8 +90,9 @@ async function acceptServiceOrder(req, res) {
             notif_data.user_id = order.customer_id;
         }
 
+        sendOrderSubscription(data);
+        
         Promise.all([
-            sendOrderSubscription(data),
             userService.addVendorNotification(notif_data),
             userService.addCustomerNotification(notif_data),
             userService.updateOrders(data)
