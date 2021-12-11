@@ -7,7 +7,7 @@ type Subscription {
 
 type Order {
 	order_id: Int!
-	vendor_id: Int!
+	vendor_id: Int
 	accepted_by: Int
 	customer_id: Int
 	reason: String
@@ -16,7 +16,7 @@ type Order {
 	total_price: Int
 	order_status: String
 	vendor_status: String,
-	vendor:Vendor
+	vendor: Vendor
 }
 
 type Vendor {
