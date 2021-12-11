@@ -59,39 +59,46 @@ async function acceptServiceOrder(req, res) {
         let user_id = req.user.id;
         let customer = await view.find('CUSTOMER', 'id', order.customer_id);
 
-        
-        if (status == 'ACCEPT') {
-            let data = {
-                sub_serivce,
-                order,
-                order_id,
-                state: 'ACCEPTED',
-                accepted_by: user_id,
-                vendor_id: user_id,
-                order_status: 'ON_THE_WAY',
-                // vendor_status: 'ON_THE_WAY',
-                customer_id: order.customer_id
-            }
-
-            sendOrderSubscription(data);
-
-            let notif_data = {
-                user_id,
-                message: 'Your job has been accepted'
-            }
-
-            await userService.addVendorNotification(notif_data);
-
-            notif_data.user_id = order.customer_id;
-
-            await userService.addCustomerNotification(notif_data);
-            
-            data.customer = customer;
-
-            userService.updateOrders(data)
-                .then(_ => resp.success(res, data))
-                .catch(err => resp.error(res, 'Something went wrong', err));   
+        let data = {
+            sub_serivce,
+            order,
+            order_id,
+            state: `${status}ED`,
+            // accepted_by: user_id,
+            vendor_id: user_id,
+            // order_status: 'ON_THE_WAY',
+            // vendor_status: 'ON_THE_WAY',
+            customer_id: order.customer_id
         }
+
+        const notif_data = {
+            user_id,
+            message: `Your job has been ${status}ED`
+        }
+
+        if(status == 'REJECT') {
+            data.order_status = 'REJECTED';
+            data.cancelled_by = user_id;
+        }
+        else if (status == 'ACCEPT') {
+
+            data.order_status = 'ON_THE_WAY';
+            data.accepted_by = user_id;
+            
+            notif_data.user_id = order.customer_id;
+        }
+
+        Promise.all([
+            sendOrderSubscription(data),
+            userService.addVendorNotification(notif_data),
+            userService.addCustomerNotification(notif_data),
+            userService.updateOrders(data)
+        ])
+        .then(_ => resp.success(res, data))
+        .catch(err => resp.error(res, 'Something went wrong', err)); 
+        return;
+        
+        data.customer = customer;
 
         let vendor_name = req.user.first_name + ' ' + req.user.last_name;
         let fcm_obj = {
@@ -99,7 +106,6 @@ async function acceptServiceOrder(req, res) {
             title: `Order is ${status}ED by the Vendor`,
             body: `You order is ${status}ED by the vendor ${vendor_name}`
         }
-
         // return await fcm.sendNotification(fcm_obj);
 
     } catch (error) {
