@@ -68,7 +68,8 @@ async function acceptServiceOrder(req, res) {
             vendor_id: user_id,
             // order_status: 'ON_THE_WAY',
             // vendor_status: 'ON_THE_WAY',
-            customer_id: order.customer_id
+            customer_id: order.customer_id,
+            vendor: req.user
         }
 
         const notif_data = {
