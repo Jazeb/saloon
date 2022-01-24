@@ -70,6 +70,14 @@ module.exports = function (sequelize, DataTypes) {
         },
         total_price:{
             type: DataTypes.INTEGER(11)
+        },
+        completed_by_vendor:{
+            type: DataTypes.BOOLEAN(),
+            defaultValue: false
+        },
+        completed_by_customer:{
+            type: DataTypes.BOOLEAN(),
+            defaultValue: false
         }
     }, {
         sequelize,

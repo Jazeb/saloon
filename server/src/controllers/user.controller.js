@@ -241,7 +241,7 @@ async function endService(req, res) {
 
         const user_id = req.user.id;
         const order = await view.find('ORDER', 'id', order_id);
-        if (_.isEmpty(order) || order.state !== 'ACCEPTED' || order.status !== 'ONGOING')
+        if (_.isEmpty(order) || order.state !== 'ACCEPTED')
             return resp.error(res, 'Invalid order id provided');
 
         const data = {
@@ -249,11 +249,16 @@ async function endService(req, res) {
             price: order.price,
             tax: order.tax,
             total_price: order.total_price,
-            status: 'COMPLETED',
-            order_status: 'COMPLETED',
             completed_at: Date.now(),
             vendor_id: order.vendor_id,
             accepted_by: order.vendor_id
+        }
+
+        if(req.user.user_type ==  'VENDOR'){
+            data.completed_by_vendor = true
+        }else{
+            data.completed_by_customer = true;
+            data.status = 'COMPLETED';
         }
 
         sendOrderSubscription(data);
@@ -278,14 +283,14 @@ async function endService(req, res) {
 
         await userService.addCustomerNotification(notif_data);
 
-        let customer = await view.find('CUSTOMER', 'id', order.customer_id);
+        // let customer = await view.find('CUSTOMER', 'id', order.customer_id);
 
-        let vendor_name = req.user.first_name + ' ' + req.user.last_name;
-        let fcm_obj = {
-            reg_id: customer.fcm_token,
-            title: `Your order is completed`,
-            body: `Your vendor ${vendor_name} has marked your order as completed`
-        }
+        // let vendor_name = req.user.first_name + ' ' + req.user.last_name;
+        // let fcm_obj = {
+        //     reg_id: customer.fcm_token,
+        //     title: `Your order is completed`,
+        //     body: `Your vendor ${vendor_name} has marked your order as completed`
+        // }
 
         // return await fcm.sendNotification(fcm_obj);
 
