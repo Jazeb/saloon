@@ -251,14 +251,14 @@ async function endService(req, res) {
             total_price: order.total_price,
             completed_at: Date.now(),
             vendor_id: order.vendor_id,
-            accepted_by: order.vendor_id
+            accepted_by: order.vendor_id, 
+            order_status: 'COMPLETED'
         }
 
         if(req.user.user_type ==  'VENDOR'){
             data.completed_by_vendor = true
         }else{
             data.completed_by_customer = true;
-            data.status = 'COMPLETED';
         }
 
         sendOrderSubscription(data);
