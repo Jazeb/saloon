@@ -110,7 +110,7 @@ async function acceptServiceOrder(req, res) {
             title: `Order is ${status}ED by the Vendor`,
             body: `You order is ${status}ED by the vendor ${vendor_name}`
         }
-        // return await fcm.sendNotification(fcm_obj);
+        return await fcm.sendNotification(fcm_obj);
 
     } catch (error) {
         console.error(error);
@@ -162,7 +162,7 @@ async function arrivedOrderUpdate(req, res) {
             body: `Your vendor ${vendor_name} arrived at your destination`
         }
 
-        // return await fcm.sendNotification(fcm_obj);
+        return await fcm.sendNotification(fcm_obj);
 
     } catch (error) {
         console.error(error);
@@ -224,7 +224,7 @@ async function startService(req, res) {
             body: `You order is started by the vendor ${vendor_name}`
         }
 
-        // return await fcm.sendNotification(fcm_obj);
+        return await fcm.sendNotification(fcm_obj);
 
     } catch (error) {
         console.error(error);
@@ -283,16 +283,16 @@ async function endService(req, res) {
 
         await userService.addCustomerNotification(notif_data);
 
-        // let customer = await view.find('CUSTOMER', 'id', order.customer_id);
+        let customer = await view.find('CUSTOMER', 'id', order.customer_id);
 
-        // let vendor_name = req.user.first_name + ' ' + req.user.last_name;
-        // let fcm_obj = {
-        //     reg_id: customer.fcm_token,
-        //     title: `Your order is completed`,
-        //     body: `Your vendor ${vendor_name} has marked your order as completed`
-        // }
+        let vendor_name = req.user.first_name + ' ' + req.user.last_name;
+        let fcm_obj = {
+            reg_id: customer.fcm_token,
+            title: `Your order is completed`,
+            body: `Your vendor ${vendor_name} has marked your order as completed`
+        }
 
-        // return await fcm.sendNotification(fcm_obj);
+        return await fcm.sendNotification(fcm_obj);
 
     } catch (error) {
         console.error(error);
@@ -400,7 +400,7 @@ async function placeService(req, res) {
         }
 
         resp.success(res, service_data, 'Service posted');
-        // return await fcm.sendNotification(fcm_obj);
+        return await fcm.sendNotification(fcm_obj);
 
     } catch (error) {
         console.log(error);
