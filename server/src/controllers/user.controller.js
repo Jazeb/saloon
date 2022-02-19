@@ -252,7 +252,8 @@ async function endService(req, res) {
             completed_at: Date.now(),
             vendor_id: order.vendor_id,
             accepted_by: order.vendor_id, 
-            order_status: 'COMPLETED'
+            order_status: 'COMPLETED',
+            customer_id: order.customer_id,
         }
 
         if(req.user.user_type ==  'VENDOR'){

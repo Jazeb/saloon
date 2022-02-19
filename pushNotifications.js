@@ -15,7 +15,7 @@ const sendNotification = data => {
         }
         fcm.send(message, (err, response) => {
             console.log(err || response)
-            if (err) return reject(err);
+            if (err) return console.error(err);
             return resolve(true);
         });
     });
