@@ -253,6 +253,7 @@ async function endService(req, res) {
             vendor_id: order.vendor_id,
             accepted_by: order.vendor_id, 
             order_status: 'COMPLETED',
+            status: 'COMPLETED',
             customer_id: order.customer_id,
         }
 
